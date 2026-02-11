@@ -195,22 +195,12 @@ let _dirty = false;
 async function loadFromPostgres(): Promise<Database> {
   const { neon } = await import('@neondatabase/serverless');
   const sql = neon(process.env.DATABASE_URL!, { fetchOptions: { cache: 'no-store' } });
-  // Ensure table exists with metadata columns
+  // Ensure table exists
   await sql`
     CREATE TABLE IF NOT EXISTS app_data (
       id INTEGER PRIMARY KEY DEFAULT 1,
-      data JSONB NOT NULL DEFAULT '{}'::jsonb,
-      last_modified TIMESTAMPTZ DEFAULT NOW(),
-      last_source TEXT DEFAULT 'unknown'
+      data JSONB NOT NULL DEFAULT '{}'::jsonb
     )
-  `;
-  // Add metadata columns if they don't exist (for existing tables)
-  await sql`
-    DO $$ BEGIN
-      ALTER TABLE app_data ADD COLUMN IF NOT EXISTS last_modified TIMESTAMPTZ DEFAULT NOW();
-      ALTER TABLE app_data ADD COLUMN IF NOT EXISTS last_source TEXT DEFAULT 'unknown';
-    EXCEPTION WHEN OTHERS THEN NULL;
-    END $$
   `;
   const result = await sql`SELECT data FROM app_data WHERE id = 1`;
   if (result.length === 0) {
@@ -247,12 +237,7 @@ async function loadFromPostgres(): Promise<Database> {
 async function saveToPostgres(db: Database): Promise<void> {
   const { neon } = await import('@neondatabase/serverless');
   const sql = neon(process.env.DATABASE_URL!, { fetchOptions: { cache: 'no-store' } });
-  const source = process.env.VERCEL ? 'vercel' : 'local';
-  const usersCount = db.users?.length ?? 0;
-  const xpCount = db.xpLogs?.length ?? 0;
-  const calCount = db.calendarEntries?.length ?? 0;
-  console.log(`[saveToPostgres] source=${source}, users=${usersCount}, xpLogs=${xpCount}, calendar=${calCount}`);
-  await sql`UPDATE app_data SET data = ${JSON.stringify(db)}::jsonb, last_modified = NOW(), last_source = ${source + ':u' + usersCount + ':x' + xpCount + ':c' + calCount} WHERE id = 1`;
+  await sql`UPDATE app_data SET data = ${JSON.stringify(db)}::jsonb WHERE id = 1`;
 }
 
 // ===== JSON file helpers (for local development / Vercel tmp fallback) =====
