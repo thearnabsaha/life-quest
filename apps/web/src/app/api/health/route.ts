@@ -43,6 +43,14 @@ export async function GET() {
         checks.writeReadTest = { error: (e as Error).message };
       }
 
+      // Check metadata to see when/where data was last written
+      try {
+        const metaResult = await sql`SELECT last_modified, last_source FROM app_data WHERE id = 1`;
+        checks.appDataMeta = metaResult.length > 0 ? metaResult[0] : 'no row';
+      } catch (e: unknown) {
+        checks.appDataMeta = { error: (e as Error).message };
+      }
+
       // Check raw data type from Neon
       const rawResult = await sql`SELECT data FROM app_data WHERE id = 1`;
       if (rawResult.length > 0) {
@@ -75,7 +83,7 @@ export async function GET() {
 
   // 3. Try initDb
   try {
-    const { initDb, readDb, flushDb } = await import('@/server/db');
+    const { initDb, readDb } = await import('@/server/db');
     await initDb();
     const db = readDb();
     checks.initDb = {
@@ -89,7 +97,7 @@ export async function GET() {
       userIds: db.users.map((u) => u.id),
       profileUserIds: db.profiles.map((p) => p.userId),
     };
-    await flushDb();
+    // DO NOT call flushDb() here — health endpoint is read-only
   } catch (err: unknown) {
     checks.initDb = {
       status: 'error',
