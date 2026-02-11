@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { initDb, flushDb } from './db';
+import { initDb, flushDb, requestStorage } from './db';
+import type { Database } from './db';
 
 // ===== Error class =====
 export class AppError extends Error {
@@ -38,11 +39,9 @@ export function handleError(err: unknown): NextResponse {
       { status: err.statusCode }
     );
   }
-  console.error(err);
-  const message =
-    process.env.NODE_ENV === 'production'
-      ? 'Internal server error'
-      : (err as Error).message || 'Internal server error';
+  console.error('[API Error]', err);
+  // Always return the error message for debugging (serverless has no persistent logs)
+  const message = (err as Error).message || 'Internal server error';
   return NextResponse.json({ message }, { status: 500 });
 }
 
@@ -56,25 +55,33 @@ type Handler = (
 
 /**
  * Wraps a Next.js API route handler to:
- * 1. Load the DB at request start
+ * 1. Load the DB at request start (in per-request isolation context)
  * 2. Handle errors uniformly
  * 3. Flush DB changes at request end
+ *
+ * Uses AsyncLocalStorage so concurrent requests don't share DB state.
  */
 export function withDb(handler: Handler): Handler {
   return async (req: NextRequest, ctx: RouteContext) => {
-    try {
-      await initDb();
-      const response = await handler(req, ctx);
-      await flushDb();
-      return response;
-    } catch (err) {
-      // Still try to flush in case of partial writes
-      try {
-        await flushDb();
-      } catch {
-        // ignore flush errors during error handling
+    // Each request gets its own isolated DB context
+    return requestStorage.run(
+      { db: null as unknown as Database, dirty: false },
+      async () => {
+        try {
+          await initDb();
+          const response = await handler(req, ctx);
+          await flushDb();
+          return response;
+        } catch (err) {
+          // Still try to flush in case of partial writes
+          try {
+            await flushDb();
+          } catch {
+            // ignore flush errors during error handling
+          }
+          return handleError(err);
+        }
       }
-      return handleError(err);
-    }
+    );
   };
 }

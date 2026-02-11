@@ -90,7 +90,10 @@ export async function getMe(userId: string): Promise<User> {
   const db = readDb();
   const user = db.users.find((u) => u.id === userId);
   if (!user) {
-    throw new AppError(404, 'User not found');
+    // Debug: log the mismatch to help diagnose
+    const userIds = db.users.map((u) => u.id);
+    console.error(`[getMe] User not found. Looking for: ${userId}, Existing IDs: ${JSON.stringify(userIds)}, Total users: ${db.users.length}`);
+    throw new AppError(404, `User not found (looking for ${userId}, have ${db.users.length} users)`);
   }
   const profile = db.profiles.find((p) => p.userId === userId);
   return {

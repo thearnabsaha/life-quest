@@ -14,13 +14,33 @@ export async function GET() {
     VERCEL: process.env.VERCEL || 'not set',
   };
 
-  // 2. Try DB connection
+  // 2. Try DB connection + raw data check
   if (process.env.DATABASE_URL) {
     try {
       const { neon } = await import('@neondatabase/serverless');
       const sql = neon(process.env.DATABASE_URL);
       const result = await sql`SELECT 1 as ok`;
       checks.db = { status: 'connected', result: result[0] };
+
+      // Check raw data type from Neon
+      const rawResult = await sql`SELECT data FROM app_data WHERE id = 1`;
+      if (rawResult.length > 0) {
+        const rawData = rawResult[0].data;
+        checks.rawDataType = typeof rawData;
+        checks.rawDataIsArray = Array.isArray(rawData);
+        if (typeof rawData === 'object' && rawData !== null) {
+          const obj = rawData as Record<string, unknown>;
+          checks.rawDataKeys = Object.keys(obj);
+          checks.rawUsersType = typeof obj.users;
+          checks.rawUsersIsArray = Array.isArray(obj.users);
+          checks.rawUsersLength = Array.isArray(obj.users) ? obj.users.length : 'n/a';
+          if (Array.isArray(obj.users) && obj.users.length > 0) {
+            checks.rawUserIds = (obj.users as { id: string }[]).map((u) => u.id);
+          }
+        }
+      } else {
+        checks.rawDataType = 'no row found';
+      }
     } catch (err: unknown) {
       checks.db = {
         status: 'error',
@@ -42,6 +62,11 @@ export async function GET() {
       users: db.users.length,
       profiles: db.profiles.length,
       categories: db.categories.length,
+      xpLogs: db.xpLogs.length,
+      calendarEntries: db.calendarEntries.length,
+      habits: db.habits.length,
+      userIds: db.users.map((u) => u.id),
+      profileUserIds: db.profiles.map((p) => p.userId),
     };
     await flushDb();
   } catch (err: unknown) {
