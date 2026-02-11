@@ -8,14 +8,17 @@ export async function GET() {
   // 1. Check env vars
   // Show partial DATABASE_URL to confirm both envs point to the same DB
   const dbUrl = process.env.DATABASE_URL || '';
-  const dbUrlHint = dbUrl
-    ? `${dbUrl.slice(0, 25)}...${dbUrl.slice(-30)}`
-    : 'MISSING';
+  // Show host portion of the URL for comparison
+  let dbHost = 'MISSING';
+  try {
+    const u = new URL(dbUrl);
+    dbHost = u.host;
+  } catch { dbHost = dbUrl ? 'parse-error' : 'MISSING'; }
   checks.env = {
     JWT_SECRET: !!process.env.JWT_SECRET ? 'SET' : 'MISSING',
     GROQ_API_KEY: !!process.env.GROQ_API_KEY ? 'SET' : 'MISSING',
     DATABASE_URL: !!process.env.DATABASE_URL ? 'SET' : 'MISSING',
-    DATABASE_URL_HINT: dbUrlHint,
+    DATABASE_HOST: dbHost,
     NODE_ENV: process.env.NODE_ENV,
     VERCEL: process.env.VERCEL || 'not set',
   };
@@ -27,6 +30,18 @@ export async function GET() {
       const sql = neon(process.env.DATABASE_URL);
       const result = await sql`SELECT 1 as ok`;
       checks.db = { status: 'connected', result: result[0] };
+
+      // Write-read test: write a timestamp to a test table and read it back
+      try {
+        await sql`CREATE TABLE IF NOT EXISTS health_ping (id INTEGER PRIMARY KEY DEFAULT 1, ts TEXT, source TEXT)`;
+        const source = process.env.VERCEL ? 'vercel' : 'local';
+        const ts = new Date().toISOString();
+        await sql`INSERT INTO health_ping (id, ts, source) VALUES (1, ${ts}, ${source}) ON CONFLICT (id) DO UPDATE SET ts = ${ts}, source = ${source}`;
+        const pingResult = await sql`SELECT ts, source FROM health_ping WHERE id = 1`;
+        checks.writeReadTest = { wrote: { ts, source }, read: pingResult[0] };
+      } catch (e: unknown) {
+        checks.writeReadTest = { error: (e as Error).message };
+      }
 
       // Check raw data type from Neon
       const rawResult = await sql`SELECT data FROM app_data WHERE id = 1`;
