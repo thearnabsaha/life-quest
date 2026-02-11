@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withDb, getUserId } from '@/server/api-utils';
 import * as goalService from '@/server/services/goal.service';
 
+export const dynamic = 'force-dynamic';
+
 export const PATCH = withDb(async (req: NextRequest, ctx) => {
   const userId = await getUserId(req);
   const { id } = await ctx.params;
