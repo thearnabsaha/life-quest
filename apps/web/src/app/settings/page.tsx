@@ -7,7 +7,7 @@ import { Toggle } from '@/components/ui/Toggle';
 import { Modal } from '@/components/ui/Modal';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProfileStore } from '@/stores/useProfileStore';
-import { Mail, Key, Zap, Palette, Volume2, Download, Upload, Trash2, RotateCcw, Info, Loader2 } from 'lucide-react';
+import { Mail, Key, Zap, Palette, Volume2, Download, Upload, Trash2, RotateCcw, Info, Loader2, LogOut } from 'lucide-react';
 
 const APP_VERSION = '0.1.0';
 
@@ -32,7 +32,7 @@ function SectionCard({
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, isInitialized } = useAuthStore();
+  const { user, isInitialized, logout } = useAuthStore();
   const { resetProfile } = useProfileStore();
 
   const [autoXP, setAutoXP] = useState(true);
@@ -109,6 +109,17 @@ export default function SettingsPage() {
             >
               <Key className="h-4 w-4" strokeWidth={2} />
               Change Password
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                router.replace('/login');
+              }}
+              className="flex items-center gap-2 border-2 border-red-500 bg-zinc-800 px-4 py-3 font-body text-sm text-red-400 transition-colors hover:bg-red-500/10"
+            >
+              <LogOut className="h-4 w-4" strokeWidth={2} />
+              Logout
             </button>
           </div>
         </SectionCard>
