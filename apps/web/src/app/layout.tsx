@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { CommandPaletteProvider } from '@/components/providers/CommandPaletteProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -22,10 +23,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${inter.className} antialiased min-h-screen bg-[#0a0a0a] text-white`}
+        className={`${inter.className} antialiased min-h-screen theme-transition`}
       >
         <AuthProvider>
-          <CommandPaletteProvider>{children}</CommandPaletteProvider>
+          <ThemeProvider>
+            <CommandPaletteProvider>{children}</CommandPaletteProvider>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

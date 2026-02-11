@@ -4,6 +4,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Theme CSS Variables (defaults = Solo Leveling) ===== */
+:root {
+  --color-bg-base: #050510;
+  --color-bg-surface: #0a0a1a;
+  --color-bg-card: #0d1530;
+  --color-bg-elevated: #152040;
+  --color-accent: #4dabff;
+  --color-accent-2: #9d4edd;
+  --color-accent-glow: rgba(77, 171, 255, 0.35);
+  --color-border: #1a2744;
+  --color-border-subtle: #253560;
+  --color-border-accent: #4dabff;
+  --color-text-primary: rgba(200, 220, 255, 0.95);
+  --color-text-muted: #5a7aa0;
+  --color-shadow: 6px 6px 0px 0px rgba(77, 171, 255, 0.2);
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -15,34 +32,125 @@
     scroll-behavior: smooth;
   }
 
+  /* ===== Theme-aware body ===== */
   body {
-    background-color: #0a0a0a;
-    color: rgb(255 255 255 / 0.9);
+    background-color: var(--color-bg-base) !important;
+    color: var(--color-text-primary) !important;
   }
 
-  /* Custom scrollbar - thin, dark */
+  /* ===== Theme-aware overrides for common Tailwind patterns ===== */
+
+  /* Main background override */
+  .bg-\[\#0a0a0a\] {
+    background-color: var(--color-bg-base) !important;
+  }
+
+  /* Surface backgrounds (sidebar, topbar) */
+  .bg-zinc-950 {
+    background-color: var(--color-bg-surface) !important;
+  }
+
+  /* Card backgrounds */
+  .bg-zinc-900 {
+    background-color: var(--color-bg-card) !important;
+  }
+
+  /* Elevated backgrounds (buttons, inputs) */
+  .bg-zinc-800 {
+    background-color: var(--color-bg-elevated) !important;
+  }
+
+  /* Border overrides */
+  .border-zinc-800 {
+    border-color: var(--color-border) !important;
+  }
+
+  .border-zinc-700 {
+    border-color: var(--color-border-subtle) !important;
+  }
+
+  .border-zinc-600 {
+    border-color: var(--color-border-subtle) !important;
+  }
+
+  /* Accent text: map neonGreen to theme accent */
+  .text-neonGreen {
+    color: var(--color-accent) !important;
+  }
+
+  /* Accent borders: map neonGreen to theme accent */
+  .border-neonGreen {
+    border-color: var(--color-accent) !important;
+  }
+
+  /* Accent backgrounds with opacity */
+  .bg-neonGreen\/5 {
+    background-color: color-mix(in srgb, var(--color-accent) 5%, transparent) !important;
+  }
+  .bg-neonGreen\/10 {
+    background-color: color-mix(in srgb, var(--color-accent) 10%, transparent) !important;
+  }
+
+  /* Map white borders on cards to theme accent borders */
+  .border-white {
+    border-color: var(--color-border-accent) !important;
+  }
+
+  /* Muted text */
+  .text-zinc-400,
+  .text-zinc-500 {
+    color: var(--color-text-muted) !important;
+  }
+
+  /* Shadow overrides for cards */
+  .shadow-\[6px_6px_0px_0px_rgba\(255\,255\,255\,0\.2\)\] {
+    box-shadow: var(--color-shadow) !important;
+  }
+
+  /* Sidebar active glow */
+  .shadow-\[0_0_12px_rgba\(57\,255\,20\,0\.3\)\] {
+    box-shadow: 0 0 12px var(--color-accent-glow) !important;
+  }
+  .shadow-\[0_0_8px_rgba\(57\,255\,20\,0\.5\)\] {
+    box-shadow: 0 0 8px var(--color-accent-glow) !important;
+  }
+
+  /* Active state backgrounds */
+  .bg-neonGreen\/10 {
+    background-color: color-mix(in srgb, var(--color-accent) 10%, transparent) !important;
+  }
+
+  /* Hover elevated */
+  .hover\:bg-zinc-800\/50:hover {
+    background-color: color-mix(in srgb, var(--color-bg-elevated) 50%, transparent) !important;
+  }
+  .hover\:bg-zinc-700:hover {
+    background-color: var(--color-bg-elevated) !important;
+  }
+
+  /* Custom scrollbar - theme aware */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #0a0a0a;
+    background: var(--color-bg-base);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #1f1f1f;
+    background: var(--color-border);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #2a2a2a;
+    background: var(--color-border-subtle);
   }
 
   /* Firefox scrollbar */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #1f1f1f #0a0a0a;
+    scrollbar-color: var(--color-border) var(--color-bg-base);
   }
 
   /* Skeleton shimmer animation */
@@ -50,23 +158,78 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+
   /* cmdk command palette - brutalist group headings */
   [cmdk-group-heading] {
     font-family: 'Press Start 2P', cursive;
     font-size: 10px;
-    color: rgb(255 255 255 / 0.5);
+    color: var(--color-text-muted);
     padding: 8px 12px 4px;
   }
 
   .skeleton-shimmer {
     background: linear-gradient(
       90deg,
-      rgb(39 39 42 / 0.4) 0%,
-      rgb(63 63 70 / 0.7) 20%,
-      rgb(39 39 42 / 0.4) 40%,
-      rgb(39 39 42 / 0.4) 100%
+      color-mix(in srgb, var(--color-bg-elevated) 40%, transparent) 0%,
+      color-mix(in srgb, var(--color-border-subtle) 70%, transparent) 20%,
+      color-mix(in srgb, var(--color-bg-elevated) 40%, transparent) 40%,
+      color-mix(in srgb, var(--color-bg-elevated) 40%, transparent) 100%
     );
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+/* ===== Animation utilities ===== */
+@layer utilities {
+  /* Glow pulse animation for accent elements */
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 8px var(--color-accent-glow); }
+    50% { box-shadow: 0 0 20px var(--color-accent-glow), 0 0 40px var(--color-accent-glow); }
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  /* Floating animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Shimmer text effect */
+  @keyframes text-shimmer {
+    0% { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .animate-text-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-accent-2) 50%,
+      var(--color-accent) 100%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: text-shimmer 3s ease-in-out infinite;
+  }
+
+  /* Theme transition */
+  .theme-transition {
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.3s ease, box-shadow 0.4s ease;
+  }
+
+  /* Particle container */
+  @keyframes particle-rise {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-40px) scale(0); }
   }
 }

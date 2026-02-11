@@ -24,13 +24,17 @@ export function TopBar() {
   return (
     <header
       className={clsx(
-        'fixed top-0 right-0 z-50 h-14 bg-zinc-950 border-b-2 border-zinc-800',
-        'flex items-center justify-between px-4 md:pr-6 transition-all duration-200',
+        'fixed top-0 right-0 z-50 h-14 border-b-2 theme-transition',
+        'flex items-center justify-between px-4 md:pr-6 transition-all duration-300',
         'left-0',
         isExpanded ? 'md:left-60' : 'md:left-16'
       )}
+      style={{
+        backgroundColor: 'var(--color-bg-surface)',
+        borderColor: 'var(--color-border)',
+      }}
     >
-      <h1 className="font-heading text-neonGreen text-sm md:text-base tracking-wider">
+      <h1 className="font-heading text-sm md:text-base tracking-wider animate-text-shimmer">
         LIFE QUEST
       </h1>
 
@@ -38,10 +42,14 @@ export function TopBar() {
         {/* Quick XP display */}
         <Link
           href="/xp"
-          className="flex items-center gap-1.5 px-2.5 py-1 border-2 border-neonGreen bg-neonGreen/5 hover:bg-neonGreen/10 transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1 border-2 transition-colors"
+          style={{
+            borderColor: 'var(--color-accent)',
+            backgroundColor: 'color-mix(in srgb, var(--color-accent) 5%, transparent)',
+          }}
         >
-          <Zap className="w-3 h-3 text-neonGreen" strokeWidth={2.5} />
-          <span className="font-heading text-xs text-neonGreen">
+          <Zap className="w-3 h-3" style={{ color: 'var(--color-accent)' }} strokeWidth={2.5} />
+          <span className="font-heading text-xs" style={{ color: 'var(--color-accent)' }}>
             {xp.toLocaleString()}
           </span>
         </Link>
@@ -49,12 +57,16 @@ export function TopBar() {
         {/* Notification bell */}
         <Link
           href="/notifications"
-          className="relative p-2 border-2 border-zinc-600 hover:border-neonPink hover:text-neonPink transition-colors"
+          className="relative p-2 border-2 transition-colors hover:shadow-glow-sm"
+          style={{ borderColor: 'var(--color-border-subtle)' }}
           aria-label="Notifications"
         >
-          <Bell className="w-4 h-4" strokeWidth={2} />
+          <Bell className="w-4 h-4" style={{ color: 'var(--color-text-primary)' }} strokeWidth={2} />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center bg-neonPink border border-black text-black font-mono text-[8px]">
+            <span
+              className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center border border-black font-mono text-[8px] text-black"
+              style={{ backgroundColor: 'var(--color-accent-2)' }}
+            >
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -63,7 +75,12 @@ export function TopBar() {
         {/* Rank badge */}
         <Link
           href="/profile"
-          className="w-8 h-8 flex items-center justify-center border-2 border-neonBlue bg-neonBlue/10 text-neonBlue font-heading text-xs hover:bg-neonBlue/20 transition-colors"
+          className="w-8 h-8 flex items-center justify-center border-2 font-heading text-xs transition-colors hover:shadow-glow-sm"
+          style={{
+            borderColor: 'var(--color-accent-2)',
+            backgroundColor: 'color-mix(in srgb, var(--color-accent-2) 10%, transparent)',
+            color: 'var(--color-accent-2)',
+          }}
           aria-label="Profile"
         >
           {rankLetter}

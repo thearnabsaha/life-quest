@@ -60,9 +60,13 @@ function NavLink({
           'flex flex-col items-center justify-center gap-1 py-2 px-3 min-w-[48px]',
           'transition-colors duration-150',
           isActive
-            ? 'text-neonGreen border-b-2 border-neonGreen shadow-[0_0_8px_rgba(57,255,20,0.5)]'
-            : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+            ? 'border-b-2 shadow-glow-sm'
+            : 'hover:bg-[var(--color-bg-elevated)]/50'
         )}
+        style={{
+          color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
+          borderColor: isActive ? 'var(--color-accent)' : 'transparent',
+        }}
       >
         <Icon className="w-5 h-5" strokeWidth={2} />
         <span className="font-body text-[10px]">{label}</span>
@@ -77,10 +81,13 @@ function NavLink({
       className={clsx(
         'flex items-center py-3 mx-2 mb-1 border-l-4 transition-all duration-150',
         isExpanded ? 'gap-3 px-4' : 'justify-center px-0',
-        isActive
-          ? 'border-neonGreen bg-neonGreen/10 text-neonGreen shadow-[0_0_12px_rgba(57,255,20,0.3)]'
-          : 'border-transparent text-zinc-400 hover:text-white hover:bg-zinc-800/50'
       )}
+      style={{
+        borderColor: isActive ? 'var(--color-accent)' : 'transparent',
+        backgroundColor: isActive ? 'color-mix(in srgb, var(--color-accent) 10%, transparent)' : 'transparent',
+        color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
+        boxShadow: isActive ? '0 0 12px var(--color-accent-glow)' : 'none',
+      }}
     >
       <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
       {isExpanded && (
@@ -98,7 +105,13 @@ export function Sidebar() {
     <>
       {/* Mobile: bottom navigation bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden">
-        <div className="bg-zinc-950 border-t-2 border-zinc-800 flex items-center justify-around py-2 px-2">
+        <div
+          className="border-t-2 flex items-center justify-around py-2 px-2 theme-transition"
+          style={{
+            backgroundColor: 'var(--color-bg-surface)',
+            borderColor: 'var(--color-border)',
+          }}
+        >
           {navItems.map(({ href, icon, label }) => {
             const isActive =
               pathname === href || (href !== '/' && pathname.startsWith(href));
@@ -119,21 +132,26 @@ export function Sidebar() {
       {/* Desktop: vertical sidebar */}
       <aside
         className={clsx(
-          'fixed left-0 top-0 z-40 h-full bg-zinc-950 border-r-2 border-zinc-800',
+          'fixed left-0 top-0 z-40 h-full border-r-2 theme-transition',
           'hidden md:flex flex-col transition-all duration-200 ease-out',
           isExpanded ? 'w-60' : 'w-16'
         )}
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderColor: 'var(--color-border)',
+        }}
       >
       {/* Collapse toggle */}
       <button
         onClick={toggle}
-        className="flex items-center justify-center h-14 w-full border-b-2 border-zinc-800 hover:bg-zinc-800/50 transition-colors"
+        className="flex items-center justify-center h-14 w-full border-b-2 transition-colors"
+        style={{ borderColor: 'var(--color-border)' }}
         aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
       >
         {isExpanded ? (
-          <ChevronLeft className="w-5 h-5 text-zinc-400" strokeWidth={2} />
+          <ChevronLeft className="w-5 h-5" style={{ color: 'var(--color-text-muted)' }} strokeWidth={2} />
         ) : (
-          <ChevronRight className="w-5 h-5 text-zinc-400" strokeWidth={2} />
+          <ChevronRight className="w-5 h-5" style={{ color: 'var(--color-text-muted)' }} strokeWidth={2} />
         )}
       </button>
 
