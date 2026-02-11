@@ -194,7 +194,7 @@ let _dirty = false;
 // ===== Neon Postgres helpers (for production deployment) =====
 async function loadFromPostgres(): Promise<Database> {
   const { neon } = await import('@neondatabase/serverless');
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = neon(process.env.DATABASE_URL!, { fetchOptions: { cache: 'no-store' } });
   // Ensure table exists with metadata columns
   await sql`
     CREATE TABLE IF NOT EXISTS app_data (
@@ -246,7 +246,7 @@ async function loadFromPostgres(): Promise<Database> {
 
 async function saveToPostgres(db: Database): Promise<void> {
   const { neon } = await import('@neondatabase/serverless');
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = neon(process.env.DATABASE_URL!, { fetchOptions: { cache: 'no-store' } });
   const source = process.env.VERCEL ? 'vercel' : 'local';
   const usersCount = db.users?.length ?? 0;
   const xpCount = db.xpLogs?.length ?? 0;

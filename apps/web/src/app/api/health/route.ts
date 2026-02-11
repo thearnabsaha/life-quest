@@ -27,7 +27,7 @@ export async function GET() {
   if (process.env.DATABASE_URL) {
     try {
       const { neon } = await import('@neondatabase/serverless');
-      const sql = neon(process.env.DATABASE_URL);
+      const sql = neon(process.env.DATABASE_URL, { fetchOptions: { cache: 'no-store' } });
       const result = await sql`SELECT 1 as ok`;
       checks.db = { status: 'connected', result: result[0] };
 
@@ -94,8 +94,8 @@ export async function GET() {
     // Check metadata (after initDb which runs migration to add columns)
     if (process.env.DATABASE_URL) {
       try {
-        const { neon } = await import('@neondatabase/serverless');
-        const sql2 = neon(process.env.DATABASE_URL);
+        const { neon: neon2 } = await import('@neondatabase/serverless');
+        const sql2 = neon2(process.env.DATABASE_URL!, { fetchOptions: { cache: 'no-store' } });
         const metaResult = await sql2`SELECT last_modified, last_source FROM app_data WHERE id = 1`;
         checks.appDataMeta = metaResult.length > 0 ? metaResult[0] : 'no row';
       } catch (e: unknown) {
