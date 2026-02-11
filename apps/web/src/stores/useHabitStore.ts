@@ -33,6 +33,7 @@ interface HabitState {
     date: string,
     hoursLogged?: number
   ) => Promise<void>;
+  uncompleteHabit: (id: string, date: string) => Promise<void>;
 }
 
 const STALE_MS = 10_000;
@@ -115,6 +116,21 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     } catch {
       set((s) => ({ isLoading: false }));
       throw new Error('Failed to complete habit');
+    }
+  },
+
+  uncompleteHabit: async (id: string, date: string) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await api.delete<Habit>(`/habits/${id}/complete?date=${date}`);
+      set((s) => ({
+        habits: s.habits.map((h) => (h.id === id ? data : h)),
+        isLoading: false,
+      }));
+      refreshAfterXP();
+    } catch {
+      set((s) => ({ isLoading: false }));
+      throw new Error('Failed to uncomplete habit');
     }
   },
 }));

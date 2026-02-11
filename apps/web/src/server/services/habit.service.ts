@@ -186,6 +186,88 @@ export async function completeHabit(
   return toHabitResponse(freshHabit, freshCompletions);
 }
 
+export async function uncompleteHabit(
+  habitId: string,
+  userId: string,
+  date: string
+): Promise<Habit> {
+  const db = readDb();
+  const habitIdx = db.habits.findIndex((h) => h.id === habitId && h.userId === userId);
+  if (habitIdx === -1) throw new AppError(404, 'Habit not found');
+
+  const habit = db.habits[habitIdx];
+  const targetDateStr = date.split('T')[0];
+
+  // Find and remove the completion for this date
+  const compIdx = db.habitCompletions.findIndex(
+    (c) => c.habitId === habitId && c.date.startsWith(targetDateStr) && c.completed
+  );
+
+  if (compIdx === -1) {
+    // Nothing to uncomplete
+    const completions = db.habitCompletions.filter((c) => c.habitId === habitId);
+    return toHabitResponse(habit, completions);
+  }
+
+  const removedComp = db.habitCompletions[compIdx];
+  const xpToRemove = removedComp.xpAwarded;
+
+  // Remove the completion
+  db.habitCompletions.splice(compIdx, 1);
+
+  // Recalculate streak from remaining completions
+  const remaining = db.habitCompletions
+    .filter((c) => c.habitId === habitId && c.completed)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  if (remaining.length === 0) {
+    db.habits[habitIdx].streak = 0;
+  } else {
+    // Count consecutive days ending at the most recent completion
+    let streak = 1;
+    for (let i = 0; i < remaining.length - 1; i++) {
+      const curr = new Date(remaining[i].date);
+      const prev = new Date(remaining[i + 1].date);
+      const diff = Math.floor((curr.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000));
+      if (diff === 1) streak++;
+      else break;
+    }
+    db.habits[habitIdx].streak = streak;
+  }
+
+  // Remove the corresponding XP log
+  if (xpToRemove > 0) {
+    const xpLogIdx = db.xpLogs.findIndex(
+      (x) => x.userId === userId && x.source === habit.name && x.amount === xpToRemove
+        && x.createdAt.startsWith(targetDateStr)
+    );
+    if (xpLogIdx !== -1) {
+      db.xpLogs.splice(xpLogIdx, 1);
+    }
+
+    // Update profile total XP
+    const profile = db.profiles.find((p) => p.userId === userId);
+    if (profile) {
+      profile.totalXP = Math.max(0, profile.totalXP - xpToRemove);
+    }
+
+    // Update calendar entry
+    const calEntry = db.calendarEntries.find(
+      (e) => e.userId === userId && e.date.startsWith(targetDateStr)
+    );
+    if (calEntry) {
+      calEntry.totalXP = Math.max(0, calEntry.totalXP - xpToRemove);
+    }
+  }
+
+  writeDb(db);
+
+  const freshDb = readDb();
+  const freshHabit = freshDb.habits.find((h) => h.id === habitId)!;
+  const freshCompletions = freshDb.habitCompletions.filter((c) => c.habitId === habitId);
+  return toHabitResponse(freshHabit, freshCompletions);
+}
+
 function toHabitResponse(
   h: { id: string; userId: string; name: string; type: string; xpReward: number; streak: number; isActive: boolean; categoryId?: string | null; subCategoryId?: string | null },
   completions: { id: string; habitId: string; date: string; completed: boolean; hoursLogged: number | null; xpAwarded: number }[]
