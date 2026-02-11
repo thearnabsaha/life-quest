@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { XPType } from '@life-quest/types';
+import { X } from 'lucide-react';
 import { AppShell } from '@/components/layout/AppShell';
 import { useXPStore } from '@/stores/useXPStore';
 import { useCategoryStore } from '@/stores/useCategoryStore';
@@ -17,7 +18,8 @@ const XP_TYPES: { value: XPType; label: string }[] = [
 const LIMIT = 20;
 
 export default function XPPage() {
-  const { logs, total, page, isLoading, fetchLogs, logXP } = useXPStore();
+  const { logs, total, page, isLoading, fetchLogs, logXP, deleteLog } = useXPStore();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const { categories, fetchCategories } = useCategoryStore();
   const { fetchProfile } = useProfileStore();
 
@@ -61,6 +63,19 @@ export default function XPPage() {
   const handleNextPage = () => {
     const totalPages = Math.ceil(total / LIMIT);
     if (page < totalPages) fetchLogs(page + 1);
+  };
+
+  const handleDeleteLog = async (logId: string) => {
+    setDeletingId(logId);
+    try {
+      await deleteLog(logId);
+      // Re-fetch profile to update XP in header/profile
+      fetchProfile();
+    } catch {
+      // handled by store
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const getCategoryName = (id: string | null) => {
@@ -216,7 +231,7 @@ export default function XPPage() {
               {logs.map((log) => (
                 <div
                   key={log.id}
-                  className="flex flex-wrap items-center gap-2 border-[2px] border-white bg-zinc-900 p-4"
+                  className="group flex flex-wrap items-center gap-2 border-[2px] border-white bg-zinc-900 p-4"
                   style={{ boxShadow: '4px 4px 0px 0px #333' }}
                 >
                   <span className="font-heading text-xs text-neonGreen">
@@ -241,6 +256,19 @@ export default function XPPage() {
                   <span className="ml-auto font-body text-xs text-zinc-500">
                     {formatDate(log.createdAt)}
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteLog(log.id)}
+                    disabled={deletingId === log.id}
+                    className="ml-2 flex h-7 w-7 items-center justify-center border-2 border-red-500/60 bg-red-500/10 text-red-400 transition-all hover:bg-red-500/30 hover:border-red-500 disabled:opacity-40 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                    title="Delete this XP entry"
+                  >
+                    {deletingId === log.id ? (
+                      <span className="block h-3 w-3 animate-spin border-2 border-red-400 border-t-transparent rounded-full" />
+                    ) : (
+                      <X className="h-3.5 w-3.5" strokeWidth={3} />
+                    )}
+                  </button>
                 </div>
               ))}
             </div>

@@ -11,3 +11,10 @@ export const PATCH = withDb(async (req: NextRequest, ctx) => {
   const log = await xpService.updateXPLog(id, userId, body);
   return NextResponse.json(log);
 });
+
+export const DELETE = withDb(async (req: NextRequest, ctx) => {
+  const userId = await getUserId(req);
+  const { id } = await ctx.params;
+  await xpService.deleteXPLog(id, userId);
+  return NextResponse.json({ message: 'XP log deleted' });
+});

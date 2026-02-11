@@ -75,7 +75,7 @@ export default function CalendarPage() {
         <CalendarStats entries={entries} year={year} />
 
         {/* Notion-like Data Tracker Table */}
-        <div className="pt-2">
+        <div className="border-2 border-[var(--color-border-accent)] bg-[var(--color-bg-card)] p-4 md:p-6 min-h-[300px]">
           <NotionTable />
         </div>
       </div>

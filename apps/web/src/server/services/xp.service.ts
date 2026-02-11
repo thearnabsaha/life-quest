@@ -146,6 +146,76 @@ export async function updateXPLog(
   return toXPLogResponse(log);
 }
 
+export async function deleteXPLog(logId: string, userId: string): Promise<void> {
+  const db = readDb();
+  const idx = db.xpLogs.findIndex((l) => l.id === logId && l.userId === userId);
+  if (idx === -1) throw new AppError(404, 'XP log not found');
+
+  const log = db.xpLogs[idx];
+  const amount = log.amount;
+
+  // Remove the log
+  db.xpLogs.splice(idx, 1);
+
+  // Subtract XP from profile
+  const profileIdx = db.profiles.findIndex((p) => p.userId === userId);
+  if (profileIdx !== -1) {
+    const profile = db.profiles[profileIdx];
+    profile.totalXP = Math.max(0, profile.totalXP - amount);
+    profile.level = profile.manualLevelOverride ?? calculateLevel(profile.totalXP);
+    profile.rank = getRank(profile.level);
+    db.profiles[profileIdx] = profile;
+  }
+
+  // Subtract XP from calendar entry
+  const logDate = log.createdAt.split('T')[0];
+  const calIdx = db.calendarEntries.findIndex(
+    (e) => e.userId === userId && e.date === logDate
+  );
+  if (calIdx !== -1) {
+    db.calendarEntries[calIdx].totalXP = Math.max(0, db.calendarEntries[calIdx].totalXP - amount);
+    // Remove entry if XP drops to 0
+    if (db.calendarEntries[calIdx].totalXP <= 0) {
+      db.calendarEntries.splice(calIdx, 1);
+    }
+  }
+
+  writeDb(db);
+}
+
+export async function clearXPHistory(userId: string): Promise<void> {
+  const db = readDb();
+
+  // Remove all XP logs for this user
+  db.xpLogs = db.xpLogs.filter((l) => l.userId !== userId);
+
+  // Remove all calendar entries for this user
+  db.calendarEntries = db.calendarEntries.filter((e) => e.userId !== userId);
+
+  // Reset profile XP, level, rank
+  const profileIdx = db.profiles.findIndex((p) => p.userId === userId);
+  if (profileIdx !== -1) {
+    const profile = db.profiles[profileIdx];
+    profile.totalXP = 0;
+    profile.level = 1;
+    profile.rank = 'E';
+    profile.manualLevelOverride = null;
+    profile.manualXPOverride = null;
+    db.profiles[profileIdx] = profile;
+  }
+
+  // Reset all habit streaks and remove completions
+  db.habits.forEach((h) => {
+    if (h.userId === userId) h.streak = 0;
+  });
+  db.habitCompletions = db.habitCompletions.filter((c) => {
+    const habit = db.habits.find((h) => h.id === c.habitId);
+    return !habit || habit.userId !== userId;
+  });
+
+  writeDb(db);
+}
+
 function toXPLogResponse(l: {
   id: string;
   userId: string;

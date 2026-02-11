@@ -154,8 +154,8 @@ export async function completeHabit(
   if (habit.type === 'MANUAL' && hoursLogged != null && hoursLogged > 0) {
     xpAwarded = Math.round(hoursLogged);
   } else if (habit.type === 'HOURS' && hoursLogged && hoursLogged > 0) {
-    // Hours type: base XP * hours logged (no cap), plus streak bonus added separately
-    xpAwarded = Math.round(baseXP * hoursLogged) + bonusXP;
+    // Hours type: base XP * hours logged (no cap), no bonus XP
+    xpAwarded = Math.round(baseXP * hoursLogged);
   } else {
     xpAwarded = baseXP + bonusXP;
   }

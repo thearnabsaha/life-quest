@@ -23,6 +23,7 @@ interface XPState {
     categoryId?: string,
     source?: string
   ) => Promise<void>;
+  deleteLog: (logId: string) => Promise<void>;
 }
 
 export const useXPStore = create<XPState>((set, get) => ({
@@ -77,8 +78,24 @@ export const useXPStore = create<XPState>((set, get) => ({
       calendarState.fetchCalendar(calendarState.year).catch(() => {});
       useProfileStore.getState().fetchProfile(true).catch(() => {});
     } catch {
-      set((s) => ({ isLoading: false }));
+      set(() => ({ isLoading: false }));
       throw new Error('Failed to log XP');
+    }
+  },
+
+  deleteLog: async (logId: string) => {
+    try {
+      await api.delete(`/xp/logs/${logId}`);
+      set((s) => ({
+        logs: s.logs.filter((l) => l.id !== logId),
+        total: Math.max(0, s.total - 1),
+      }));
+      // Refresh profile and calendar since XP was subtracted
+      useProfileStore.getState().fetchProfile(true).catch(() => {});
+      const calendarState = useCalendarStore.getState();
+      calendarState.fetchCalendar(calendarState.year).catch(() => {});
+    } catch {
+      throw new Error('Failed to delete XP log');
     }
   },
 }));

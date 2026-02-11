@@ -148,7 +148,7 @@ function CellEditor({
           if (e.key === 'Enter') handleBlur();
           if (e.key === 'Escape') setEditing(false);
         }}
-        className="w-full bg-transparent outline-none px-2 py-1 font-mono text-sm"
+        className="w-full bg-transparent outline-none px-3 py-2 font-mono text-sm"
         style={{ color: 'var(--color-text-primary)' }}
         step={column.type === 'number' ? 'any' : undefined}
       />
@@ -164,7 +164,7 @@ function CellEditor({
 
   return (
     <div
-      className="px-2 py-1 cursor-text min-h-[28px] font-mono text-sm truncate"
+      className="px-3 py-2 cursor-text min-h-[36px] font-mono text-sm truncate flex items-center"
       style={{ color: display ? 'var(--color-text-primary)' : 'var(--color-text-muted)' }}
       onClick={() => {
         setLocalVal(display);
@@ -586,19 +586,19 @@ export function NotionTable() {
             backgroundColor: 'var(--color-bg-card)',
           }}
         >
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse min-w-[500px]">
+          <div className="overflow-x-auto" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+            <table className="w-full border-collapse min-w-[500px] table-fixed">
               {/* Column headers */}
               <thead>
                 <tr style={{ backgroundColor: 'var(--color-bg-elevated)' }}>
                   {/* Date column (fixed) */}
                   <th
-                    className="px-3 py-2 text-left font-mono text-xs font-bold tracking-wider whitespace-nowrap"
+                    className="px-3 py-3 text-left font-mono text-xs font-bold tracking-wider whitespace-nowrap"
                     style={{
                       color: 'var(--color-text-muted)',
                       borderBottom: '2px solid var(--color-border)',
                       borderRight: '1px solid var(--color-border)',
-                      width: 120,
+                      width: 140,
                     }}
                   >
                     <div className="flex items-center gap-1.5">
@@ -610,7 +610,7 @@ export function NotionTable() {
                   {columns.map((col) => (
                     <th
                       key={col.id}
-                      className="px-3 py-2 text-left font-mono text-xs font-bold tracking-wider whitespace-nowrap relative"
+                      className="px-3 py-3 text-left font-mono text-xs font-bold tracking-wider whitespace-nowrap relative"
                       style={{
                         color: 'var(--color-text-muted)',
                         borderBottom: '2px solid var(--color-border)',
@@ -687,7 +687,7 @@ export function NotionTable() {
                     >
                       {/* Date cell */}
                       <td
-                        className="px-3 py-1 font-mono text-xs"
+                        className="px-3 py-2.5 font-mono text-xs"
                         style={{
                           color: 'var(--color-text-primary)',
                           borderRight: '1px solid var(--color-border)',

@@ -173,7 +173,9 @@ export default function SettingsPage() {
 
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [clearXPModalOpen, setClearXPModalOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [isClearingXP, setIsClearingXP] = useState(false);
   const [showAllThemes, setShowAllThemes] = useState(false);
 
   useEffect(() => {
@@ -227,6 +229,22 @@ export default function SettingsPage() {
       window.location.href = '/';
     } catch {
       setIsResetting(false);
+    }
+  };
+
+  const handleClearXP = async () => {
+    setIsClearingXP(true);
+    try {
+      const token = useAuthStore.getState().token;
+      const res = await fetch('/api/xp/clear', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to clear XP');
+      setClearXPModalOpen(false);
+      window.location.href = '/';
+    } catch {
+      setIsClearingXP(false);
     }
   };
 
@@ -551,6 +569,17 @@ export default function SettingsPage() {
           <div className="flex flex-wrap gap-3">
             <motion.button
               type="button"
+              onClick={() => setClearXPModalOpen(true)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-2 border-2 border-orange-500 px-4 py-3 font-body text-sm text-orange-400 transition-colors hover:bg-orange-500/10"
+              style={{ backgroundColor: 'var(--color-bg-elevated)' }}
+            >
+              <Zap className="h-4 w-4" strokeWidth={2} />
+              Clear XP History
+            </motion.button>
+            <motion.button
+              type="button"
               onClick={() => setResetModalOpen(true)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -641,6 +670,60 @@ export default function SettingsPage() {
                 </>
               ) : (
                 'RESET EVERYTHING'
+              )}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Clear XP History Modal */}
+      <Modal
+        isOpen={clearXPModalOpen}
+        onClose={() => !isClearingXP && setClearXPModalOpen(false)}
+        title="CLEAR XP HISTORY"
+      >
+        <div className="space-y-6">
+          <div className="border-2 border-orange-500/30 bg-orange-500/5 p-4">
+            <p className="font-body text-sm mb-2" style={{ color: 'var(--color-text-primary)' }}>
+              This will <span className="text-orange-400 font-bold">permanently delete</span>:
+            </p>
+            <ul className="font-body text-xs space-y-1 ml-4 list-disc" style={{ color: 'var(--color-text-muted)' }}>
+              <li>All XP logs and history</li>
+              <li>All calendar activity entries</li>
+              <li>All habit completions and streaks</li>
+              <li>Reset your level to 1 and XP to 0</li>
+            </ul>
+            <p className="font-body text-xs text-orange-400 mt-3 font-bold">
+              Your habits, categories, and challenges will remain. Only XP data is removed.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setClearXPModalOpen(false)}
+              disabled={isClearingXP}
+              className="flex-1 border-2 px-4 py-3 font-body text-sm disabled:opacity-50"
+              style={{
+                borderColor: 'var(--color-border-accent)',
+                backgroundColor: 'var(--color-bg-elevated)',
+                color: 'var(--color-text-primary)',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleClearXP}
+              disabled={isClearingXP}
+              className="flex-1 border-4 border-orange-500 bg-orange-500 px-4 py-3 font-heading text-xs text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isClearingXP ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  CLEARING...
+                </>
+              ) : (
+                'CLEAR ALL XP'
               )}
             </button>
           </div>
