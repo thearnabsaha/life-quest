@@ -6,10 +6,16 @@ export async function GET() {
   const checks: Record<string, unknown> = {};
 
   // 1. Check env vars
+  // Show partial DATABASE_URL to confirm both envs point to the same DB
+  const dbUrl = process.env.DATABASE_URL || '';
+  const dbUrlHint = dbUrl
+    ? `${dbUrl.slice(0, 25)}...${dbUrl.slice(-30)}`
+    : 'MISSING';
   checks.env = {
     JWT_SECRET: !!process.env.JWT_SECRET ? 'SET' : 'MISSING',
     GROQ_API_KEY: !!process.env.GROQ_API_KEY ? 'SET' : 'MISSING',
     DATABASE_URL: !!process.env.DATABASE_URL ? 'SET' : 'MISSING',
+    DATABASE_URL_HINT: dbUrlHint,
     NODE_ENV: process.env.NODE_ENV,
     VERCEL: process.env.VERCEL || 'not set',
   };
