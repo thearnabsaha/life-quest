@@ -180,9 +180,10 @@ function defaultDb(): Database {
 let _dbCache: Database | null = null;
 let _dirty = false;
 
-// ===== Postgres helpers (for Vercel deployment) =====
+// ===== Neon Postgres helpers (for production deployment) =====
 async function loadFromPostgres(): Promise<Database> {
-  const { sql } = await import('@vercel/postgres');
+  const { neon } = await import('@neondatabase/serverless');
+  const sql = neon(process.env.DATABASE_URL!);
   // Ensure table exists
   await sql`
     CREATE TABLE IF NOT EXISTS app_data (
@@ -191,12 +192,12 @@ async function loadFromPostgres(): Promise<Database> {
     )
   `;
   const result = await sql`SELECT data FROM app_data WHERE id = 1`;
-  if (result.rows.length === 0) {
+  if (result.length === 0) {
     const db = defaultDb();
     await sql`INSERT INTO app_data (id, data) VALUES (1, ${JSON.stringify(db)}::jsonb)`;
     return db;
   }
-  const parsed = result.rows[0].data as Partial<Database>;
+  const parsed = result[0].data as Partial<Database>;
   const defaults = defaultDb();
   const merged = { ...defaults, ...parsed } as unknown as Record<string, unknown>;
   for (const key of Object.keys(defaults)) {
@@ -208,7 +209,8 @@ async function loadFromPostgres(): Promise<Database> {
 }
 
 async function saveToPostgres(db: Database): Promise<void> {
-  const { sql } = await import('@vercel/postgres');
+  const { neon } = await import('@neondatabase/serverless');
+  const sql = neon(process.env.DATABASE_URL!);
   await sql`UPDATE app_data SET data = ${JSON.stringify(db)}::jsonb WHERE id = 1`;
 }
 
@@ -253,7 +255,7 @@ function writeToFile(db: Database): void {
 
 // ===== Detect if we're using Postgres =====
 function usePostgres(): boolean {
-  return !!(process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING);
+  return !!process.env.DATABASE_URL;
 }
 
 // ===== Public API (stays synchronous for service layer compatibility) =====

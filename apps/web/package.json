@@ -15,7 +15,7 @@
     "@life-quest/types": "workspace:*",
     "@life-quest/ui": "workspace:*",
     "@life-quest/utils": "workspace:*",
-    "@vercel/postgres": "^0.10.0",
+    "@neondatabase/serverless": "^1.0.2",
     "axios": "^1.7.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.0",

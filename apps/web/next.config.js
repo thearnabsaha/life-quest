@@ -13,7 +13,7 @@ const nextConfig = {
     // Disable tracing to avoid OneDrive EPERM file lock errors
     instrumentationHook: false,
     // Allow server-side Node.js modules in API routes
-    serverComponentsExternalPackages: ['bcryptjs', 'jsonwebtoken', 'groq-sdk', '@vercel/postgres'],
+    serverComponentsExternalPackages: ['bcryptjs', 'jsonwebtoken', 'groq-sdk', '@neondatabase/serverless'],
   },
 };
 module.exports = nextConfig;
