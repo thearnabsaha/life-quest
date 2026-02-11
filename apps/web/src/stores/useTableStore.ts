@@ -66,8 +66,15 @@ export const useTableStore = create<TableState>((set, get) => ({
 
   fetchAll: async () => {
     set({ isLoading: true });
-    await Promise.all([get().fetchColumns(), get().fetchRows()]);
-    set({ isLoading: false });
+    try {
+      // Single batch request instead of 2 parallel calls
+      const { data } = await api.get<{ columns: TableColumn[]; rows: TableRow[] }>('/table');
+      set({ columns: data.columns, rows: data.rows, isLoading: false });
+    } catch {
+      // Fallback to individual calls if batch fails
+      await Promise.all([get().fetchColumns(), get().fetchRows()]);
+      set({ isLoading: false });
+    }
   },
 
   addColumn: async (colData) => {

@@ -219,14 +219,14 @@ export function AIChatBar() {
                     </p>
                     <p className="font-body text-xs text-zinc-600 leading-relaxed">
                       Tell me what you did today, ask me to create categories,
-                      habits, or goals. I&apos;ll handle the rest.
+                      habits, or challenges. I&apos;ll handle the rest.
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {[
                       'I did my morning run',
                       'Create Health category',
-                      'Add a study goal',
+                      'Add a study challenge',
                     ].map((suggestion) => (
                       <button
                         key={suggestion}

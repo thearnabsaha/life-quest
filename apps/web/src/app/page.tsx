@@ -15,6 +15,7 @@ import { useHabitStore } from '@/stores/useHabitStore';
 import { useCalendarStore } from '@/stores/useCalendarStore';
 import { useGoalStore } from '@/stores/useGoalStore';
 import { useNotificationStore } from '@/stores/useNotificationStore';
+// Direct store references for batch hydration (no re-render subscription needed)
 import { formatDate } from '@life-quest/utils';
 import type { Profile } from '@life-quest/types';
 import {
@@ -149,25 +150,68 @@ export default function DashboardPage() {
     markAsRead,
   } = useNotificationStore();
 
+  const [dashLoaded, setDashLoaded] = useState(false);
+
   useEffect(() => {
     if (!isInitialized) return;
     if (!user) {
       router.replace('/login');
       return;
     }
-    // Force fresh data on every dashboard visit
-    fetchProfile(true);
-    fetchLogs(1);
-    fetchCategories(true);
-    fetchHabits(true);
-    fetchCalendar();
-    fetchGoals(true);
-    fetchNotifications(20);
-    fetchUnreadCount();
+    if (dashLoaded) return;
+
+    // Single batch request replaces 8 individual API calls
+    const token = useAuthStore.getState().token;
+    const year = new Date().getFullYear();
+    fetch(`/api/dashboard?year=${year}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // Hydrate all stores from the single response
+        if (data.profile) {
+          useProfileStore.setState({ profile: data.profile, _lastFetch: Date.now(), isLoading: false });
+        }
+        if (data.xpLogs) {
+          useXPStore.setState({ logs: data.xpLogs.data, total: data.xpLogs.total, page: data.xpLogs.page, isLoading: false });
+        }
+        if (data.categories) {
+          useCategoryStore.setState({ categories: data.categories, _lastFetch: Date.now(), isLoading: false });
+        }
+        if (data.habits) {
+          useHabitStore.setState({ habits: data.habits, _lastFetch: Date.now(), isLoading: false });
+        }
+        if (data.calendar) {
+          useCalendarStore.setState({ entries: data.calendar, year, isLoading: false });
+        }
+        if (data.goals) {
+          useGoalStore.setState({ goals: data.goals, _lastFetch: Date.now(), isLoading: false });
+        }
+        if (data.notifications) {
+          useNotificationStore.setState({ notifications: data.notifications, isLoading: false });
+        }
+        if (data.unreadCount !== undefined) {
+          useNotificationStore.setState({ unreadCount: data.unreadCount, _lastCountFetch: Date.now() });
+        }
+        setDashLoaded(true);
+      })
+      .catch(() => {
+        // Fallback: fetch individually if batch fails
+        fetchProfile(true);
+        fetchLogs(1);
+        fetchCategories(true);
+        fetchHabits(true);
+        fetchCalendar();
+        fetchGoals(true);
+        fetchNotifications(20);
+        fetchUnreadCount();
+        setDashLoaded(true);
+      });
   }, [
     user,
     isInitialized,
     router,
+    dashLoaded,
     fetchProfile,
     fetchLogs,
     fetchCategories,

@@ -4,6 +4,7 @@ import '@/styles/globals.css';
 import { CommandPaletteProvider } from '@/components/providers/CommandPaletteProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { ToastContainer } from '@/components/ui/ToastContainer';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,7 +28,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ThemeProvider>
-            <CommandPaletteProvider>{children}</CommandPaletteProvider>
+            <CommandPaletteProvider>
+              {children}
+              <ToastContainer />
+            </CommandPaletteProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

@@ -381,7 +381,7 @@ function PurchaseConfirmModal({
 export default function ShopPage() {
   const router = useRouter();
   const { user, isInitialized } = useAuthStore();
-  const { items, fetchItems, createItem, updateItem, deleteItem, purchaseItem, refundItem } = useShopStore();
+  const { items, isLoading: shopLoading, fetchItems, createItem, updateItem, deleteItem, purchaseItem, refundItem } = useShopStore();
   const { profile, fetchProfile } = useProfileStore();
 
   const [formOpen, setFormOpen] = useState(false);
@@ -525,7 +525,12 @@ export default function ShopPage() {
         </div>
 
         {/* Shop Grid */}
-        {filteredItems.length === 0 ? (
+        {shopLoading && items.length === 0 ? (
+          <div className="border-2 border-white bg-zinc-900 p-16 text-center">
+            <div className="inline-block h-6 w-6 animate-spin border-2 border-neonPurple border-t-transparent rounded-full mb-3" />
+            <p className="font-body text-sm text-zinc-400">Loading shop items...</p>
+          </div>
+        ) : filteredItems.length === 0 ? (
           <div className="border-2 border-white bg-zinc-900 p-12 text-center shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)]">
             <ShoppingBag className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
             <p className="font-body text-zinc-400 mb-2">

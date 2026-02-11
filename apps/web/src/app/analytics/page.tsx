@@ -37,20 +37,20 @@ function getLast30Days(): string[] {
 }
 
 export default function AnalyticsPage() {
-  const { entries, year, fetchCalendar } = useCalendarStore();
-  const { logs, fetchLogs } = useXPStore();
+  const { entries, year, isLoading: calendarLoading, fetchCalendar } = useCalendarStore();
+  const { logs, isLoading: xpLoading, fetchLogs } = useXPStore();
   const { categories, fetchCategories } = useCategoryStore();
   const { habits, fetchHabits } = useHabitStore();
   const { profile, fetchProfile } = useProfileStore();
 
   useEffect(() => {
     const currentYear = new Date().getFullYear();
-    // Force fresh data on every analytics page visit
     fetchCalendar(currentYear);
     fetchLogs(1, 200);
-    fetchCategories(true);
-    fetchHabits(true);
-    fetchProfile(true);
+    // Use staleness — don't force-refresh if data was recently loaded
+    fetchCategories();
+    fetchHabits();
+    fetchProfile();
   }, [fetchCalendar, fetchLogs, fetchCategories, fetchHabits, fetchProfile]);
 
   // 1. Profile Overview - XP over time (last 30 days from calendar entries)
@@ -174,12 +174,21 @@ export default function AnalyticsPage() {
   const cardClass =
     'border-2 border-zinc-800 bg-zinc-900 p-4 md:p-6 shadow-[6px_6px_0px_0px_rgba(255,255,255,0.1)]';
 
+  const isLoading = calendarLoading || xpLoading;
+
   return (
     <AppShell>
       <div className="space-y-8">
         <h1 className="font-heading text-xl md:text-2xl lg:text-3xl text-neonBlue">
           ANALYTICS
         </h1>
+
+        {isLoading && logs.length === 0 && (
+          <div className="border-2 border-zinc-800 bg-zinc-900 p-16 text-center">
+            <div className="inline-block h-6 w-6 animate-spin border-2 border-neonBlue border-t-transparent rounded-full mb-3" />
+            <p className="font-body text-sm text-zinc-400">Loading analytics data...</p>
+          </div>
+        )}
 
         {/* 1. Profile Overview */}
         <section className={cardClass}>

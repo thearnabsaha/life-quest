@@ -3,6 +3,7 @@ import type { XPLog, XPType } from '@life-quest/types';
 import api from '@/lib/api';
 import { useCalendarStore } from './useCalendarStore';
 import { useProfileStore } from './useProfileStore';
+import { showToast } from './useToastStore';
 
 interface XPLogsResponse {
   data: XPLog[];
@@ -79,6 +80,7 @@ export const useXPStore = create<XPState>((set, get) => ({
       useProfileStore.getState().fetchProfile(true).catch(() => {});
     } catch {
       set(() => ({ isLoading: false }));
+      showToast('Failed to log XP');
       throw new Error('Failed to log XP');
     }
   },
@@ -95,6 +97,7 @@ export const useXPStore = create<XPState>((set, get) => ({
       const calendarState = useCalendarStore.getState();
       calendarState.fetchCalendar(calendarState.year).catch(() => {});
     } catch {
+      showToast('Failed to delete XP log');
       throw new Error('Failed to delete XP log');
     }
   },

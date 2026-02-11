@@ -107,6 +107,17 @@
     box-shadow: var(--color-shadow) !important;
   }
 
+  /* Theme-aware shadow classes */
+  .shadow-theme {
+    box-shadow: var(--color-shadow) !important;
+  }
+  .shadow-theme-sm {
+    box-shadow: 4px 4px 0px 0px color-mix(in srgb, var(--color-accent) 20%, transparent) !important;
+  }
+  .shadow-theme-accent {
+    box-shadow: 6px 6px 0px 0px color-mix(in srgb, var(--color-accent) 35%, transparent) !important;
+  }
+
   /* Sidebar active glow */
   .shadow-\[0_0_12px_rgba\(57\,255\,20\,0\.3\)\] {
     box-shadow: 0 0 12px var(--color-accent-glow) !important;
@@ -114,6 +125,43 @@
   .shadow-\[0_0_8px_rgba\(57\,255\,20\,0\.5\)\] {
     box-shadow: 0 0 8px var(--color-accent-glow) !important;
   }
+
+  /* Override hardcoded boxShadow from inline styles on common patterns */
+  .shadow-\[4px_4px_0px_0px_\#39ff14\] {
+    box-shadow: 4px 4px 0px 0px var(--color-accent) !important;
+  }
+  .shadow-\[6px_6px_0px_0px_\#39ff14\] {
+    box-shadow: 6px 6px 0px 0px var(--color-accent) !important;
+  }
+  .shadow-\[4px_4px_0px_0px_\#fff\] {
+    box-shadow: 4px 4px 0px 0px var(--color-border-accent) !important;
+  }
+  .shadow-\[6px_6px_0px_0px_\#fff\] {
+    box-shadow: 6px 6px 0px 0px var(--color-border-accent) !important;
+  }
+  .shadow-\[4px_4px_0px_0px_\#333\] {
+    box-shadow: 4px 4px 0px 0px var(--color-border) !important;
+  }
+  .shadow-\[2px_2px_0px_0px_\#333\] {
+    box-shadow: 2px 2px 0px 0px var(--color-border) !important;
+  }
+  .shadow-\[3px_3px_0px_0px_\#fff\] {
+    box-shadow: 3px 3px 0px 0px var(--color-border-accent) !important;
+  }
+
+  /* Additional accent color text overrides */
+  .text-neonBlue { color: var(--color-accent-2) !important; }
+  .text-neonPink { color: color-mix(in srgb, var(--color-accent-2) 80%, #ff2d95) !important; }
+  .text-neonYellow { color: color-mix(in srgb, var(--color-accent) 60%, #ffe600) !important; }
+  .text-neonPurple { color: var(--color-accent-2) !important; }
+
+  .border-neonBlue { border-color: var(--color-accent-2) !important; }
+  .border-neonPink { border-color: color-mix(in srgb, var(--color-accent-2) 80%, #ff2d95) !important; }
+  .border-neonYellow { border-color: color-mix(in srgb, var(--color-accent) 60%, #ffe600) !important; }
+  .border-neonPurple { border-color: var(--color-accent-2) !important; }
+
+  .bg-neonGreen { background-color: var(--color-accent) !important; }
+  .bg-neonPurple { background-color: var(--color-accent-2) !important; }
 
   /* Active state backgrounds */
   .bg-neonGreen\/10 {

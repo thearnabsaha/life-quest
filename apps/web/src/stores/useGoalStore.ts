@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Goal, GoalType, GoalStatus } from '@life-quest/types';
 import api from '@/lib/api';
 import { refreshAfterXP } from './refreshStores';
+import { showToast } from './useToastStore';
 
 export interface CreateGoalData {
   title: string;
@@ -68,6 +69,7 @@ export const useGoalStore = create<GoalState>((set, get) => ({
       return data;
     } catch {
       set((s) => ({ isLoading: false }));
+      showToast('Failed to create challenge');
       throw new Error('Failed to create goal');
     }
   },
@@ -86,6 +88,7 @@ export const useGoalStore = create<GoalState>((set, get) => ({
       }
     } catch {
       set((s) => ({ isLoading: false }));
+      showToast('Failed to update challenge');
       throw new Error('Failed to update goal');
     }
   },

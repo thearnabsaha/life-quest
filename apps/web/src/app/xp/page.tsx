@@ -105,8 +105,7 @@ export default function XPPage() {
 
         {/* Log XP manually card */}
         <div
-          className="border-[3px] border-white bg-zinc-900 p-6"
-          style={{ boxShadow: '6px 6px 0px 0px #39ff14' }}
+          className="border-[3px] border-white bg-zinc-900 p-6 shadow-[6px_6px_0px_0px_#39ff14]"
         >
           <h2 className="mb-4 font-heading text-sm uppercase tracking-wider text-white">
             Log XP manually
@@ -126,8 +125,7 @@ export default function XPPage() {
                   min={1}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white focus:outline-none focus:ring-2 focus:ring-neonGreen"
-                  style={{ boxShadow: '4px 4px 0px 0px #fff' }}
+                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white focus:outline-none focus:ring-2 focus:ring-neonGreen shadow-[4px_4px_0px_0px_#fff]"
                   placeholder="0"
                 />
               </div>
@@ -142,8 +140,7 @@ export default function XPPage() {
                   id="xp-type"
                   value={type}
                   onChange={(e) => setType(e.target.value as XPType)}
-                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white focus:outline-none"
-                  style={{ boxShadow: '4px 4px 0px 0px #fff' }}
+                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white focus:outline-none shadow-[4px_4px_0px_0px_#fff]"
                 >
                   {XP_TYPES.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -166,8 +163,7 @@ export default function XPPage() {
                   type="text"
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
-                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white placeholder:text-zinc-500 focus:outline-none"
-                  style={{ boxShadow: '4px 4px 0px 0px #fff' }}
+                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white placeholder:text-zinc-500 focus:outline-none shadow-[4px_4px_0px_0px_#fff]"
                   placeholder="Description"
                 />
               </div>
@@ -182,8 +178,7 @@ export default function XPPage() {
                   id="xp-category"
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white focus:outline-none"
-                  style={{ boxShadow: '4px 4px 0px 0px #fff' }}
+                  className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white focus:outline-none shadow-[4px_4px_0px_0px_#fff]"
                 >
                   <option value="">— None —</option>
                   {categories.map((c) => (
@@ -199,8 +194,7 @@ export default function XPPage() {
               disabled={
                 isSubmitting || !amount || parseInt(amount, 10) <= 0
               }
-              className="w-full border-[2px] border-white bg-neonGreen px-6 py-4 font-body text-sm font-bold uppercase tracking-wider text-black transition-all hover:bg-[#2dd610] disabled:opacity-50 sm:w-auto"
-              style={{ boxShadow: '4px 4px 0px 0px #fff' }}
+              className="w-full border-[2px] border-white bg-neonGreen px-6 py-4 font-body text-sm font-bold uppercase tracking-wider text-black transition-all hover:opacity-90 disabled:opacity-50 sm:w-auto shadow-[4px_4px_0px_0px_#fff]"
             >
               {isSubmitting ? 'Logging...' : 'LOG XP'}
             </button>
@@ -213,17 +207,11 @@ export default function XPPage() {
             XP History
           </h2>
           {isLoading && logs.length === 0 ? (
-            <div
-              className="border-[3px] border-white bg-zinc-900 p-12 text-center"
-              style={{ boxShadow: '6px 6px 0px 0px #39ff14' }}
-            >
+            <div className="border-[3px] border-white bg-zinc-900 p-12 text-center shadow-[6px_6px_0px_0px_#39ff14]">
               <p className="font-body text-zinc-400">Loading logs...</p>
             </div>
           ) : logs.length === 0 ? (
-            <div
-              className="border-[3px] border-white bg-zinc-900 p-12 text-center"
-              style={{ boxShadow: '6px 6px 0px 0px #39ff14' }}
-            >
+            <div className="border-[3px] border-white bg-zinc-900 p-12 text-center shadow-[6px_6px_0px_0px_#39ff14]">
               <p className="font-body text-zinc-400">No XP logs yet.</p>
             </div>
           ) : (
@@ -231,15 +219,13 @@ export default function XPPage() {
               {logs.map((log) => (
                 <div
                   key={log.id}
-                  className="group flex flex-wrap items-center gap-2 border-[2px] border-white bg-zinc-900 p-4"
-                  style={{ boxShadow: '4px 4px 0px 0px #333' }}
+                  className="group flex flex-wrap items-center gap-2 border-[2px] border-white bg-zinc-900 p-4 shadow-[4px_4px_0px_0px_#333]"
                 >
                   <span className="font-heading text-xs text-neonGreen">
                     +{log.amount} XP
                   </span>
                   <span
-                    className="border-[2px] border-zinc-600 px-2 py-0.5 font-mono text-xs text-zinc-400"
-                    style={{ boxShadow: '2px 2px 0px 0px #333' }}
+                    className="border-[2px] border-zinc-600 px-2 py-0.5 font-mono text-xs text-zinc-400 shadow-[2px_2px_0px_0px_#333]"
                   >
                     {log.type}
                   </span>
@@ -280,8 +266,7 @@ export default function XPPage() {
                 type="button"
                 onClick={handlePrevPage}
                 disabled={page <= 1 || isLoading}
-                className="border-[2px] border-white bg-zinc-800 px-4 py-2 font-body text-sm font-semibold text-white disabled:opacity-50"
-                style={{ boxShadow: '3px 3px 0px 0px #fff' }}
+                className="border-[2px] border-white bg-zinc-800 px-4 py-2 font-body text-sm font-semibold text-white disabled:opacity-50 shadow-[4px_4px_0px_0px_#fff]"
               >
                 Previous
               </button>
@@ -292,8 +277,7 @@ export default function XPPage() {
                 type="button"
                 onClick={handleNextPage}
                 disabled={page >= totalPages || isLoading}
-                className="border-[2px] border-white bg-zinc-800 px-4 py-2 font-body text-sm font-semibold text-white disabled:opacity-50"
-                style={{ boxShadow: '3px 3px 0px 0px #fff' }}
+                className="border-[2px] border-white bg-zinc-800 px-4 py-2 font-body text-sm font-semibold text-white disabled:opacity-50 shadow-[4px_4px_0px_0px_#fff]"
               >
                 Next
               </button>

@@ -15,6 +15,11 @@ import {
   Zap,
   FolderPlus,
   SquarePlus,
+  Radar,
+  ShoppingBag,
+  BarChart3,
+  Bell,
+  BookOpen,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -22,8 +27,14 @@ const NAV_ITEMS = [
   { value: 'nav-profile', label: 'Profile', icon: User, href: '/profile' },
   { value: 'nav-categories', label: 'Categories', icon: FolderOpen, href: '/categories' },
   { value: 'nav-habits', label: 'Habits', icon: CheckSquare, href: '/habits' },
-  { value: 'nav-goals', label: 'Goals', icon: Target, href: '/goals' },
+  { value: 'nav-goals', label: 'Challenges', icon: Target, href: '/goals' },
+  { value: 'nav-xp', label: 'XP Logs', icon: Zap, href: '/xp' },
   { value: 'nav-calendar', label: 'Calendar', icon: Calendar, href: '/calendar' },
+  { value: 'nav-radar', label: 'Radar Stats', icon: Radar, href: '/radar' },
+  { value: 'nav-analytics', label: 'Analytics', icon: BarChart3, href: '/analytics' },
+  { value: 'nav-shop', label: 'Shop', icon: ShoppingBag, href: '/shop' },
+  { value: 'nav-notifications', label: 'Notifications', icon: Bell, href: '/notifications' },
+  { value: 'nav-rulebook', label: 'Rulebook', icon: BookOpen, href: '/rulebook' },
   { value: 'nav-settings', label: 'Settings', icon: Settings, href: '/settings' },
 ] as const;
 
@@ -32,7 +43,7 @@ const ACTION_ITEMS = [
   { value: 'action-complete-habit', label: 'Complete Habit', icon: CheckSquare, href: '/habits', action: 'complete-habit' },
   { value: 'action-add-category', label: 'Add Category', icon: FolderPlus, href: '/categories', action: 'add-category' },
   { value: 'action-add-habit', label: 'Add Habit', icon: SquarePlus, href: '/habits', action: 'add-habit' },
-  { value: 'action-add-goal', label: 'Add Goal', icon: Target, href: '/goals', action: 'add-goal' },
+  { value: 'action-add-goal', label: 'Add Challenge', icon: Target, href: '/goals', action: 'add-goal' },
 ] as const;
 
 export function CommandPalette() {

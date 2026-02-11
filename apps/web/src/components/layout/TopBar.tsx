@@ -14,8 +14,10 @@ export function TopBar() {
   const { unreadCount, fetchUnreadCount } = useNotificationStore();
 
   useEffect(() => {
-    fetchProfile();
-    fetchUnreadCount();
+    // Respects store staleness (10s for profile, 15s for unread count).
+    // Won't re-fetch if data was recently loaded (e.g. by dashboard batch).
+    fetchProfile();       // Only fetches if stale (>10s) or no data
+    fetchUnreadCount();   // Only fetches if stale (>15s)
   }, [fetchProfile, fetchUnreadCount]);
 
   const xp = profile?.totalXP ?? 0;

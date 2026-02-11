@@ -135,7 +135,7 @@ export function GoalForm({ isOpen, onClose, goal }: GoalFormProps) {
             onChange={(e) => setTitle(e.target.value)}
             className="w-full border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white focus:outline-none focus:ring-2 focus:ring-neonGreen"
             style={{ boxShadow: '4px 4px 0px 0px #fff' }}
-            placeholder="Goal title"
+            placeholder="Challenge title"
           />
         </div>
 

@@ -633,7 +633,7 @@ export default function SettingsPage() {
               <li>All categories and subcategories</li>
               <li>All habits and completions</li>
               <li>All XP logs and history</li>
-              <li>All challenges/goals</li>
+              <li>All challenges</li>
               <li>All notifications</li>
               <li>All shop items and purchases</li>
               <li>Calendar entries</li>

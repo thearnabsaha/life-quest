@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Habit, HabitType } from '@life-quest/types';
 import api from '@/lib/api';
 import { refreshAfterXP } from './refreshStores';
+import { showToast } from './useToastStore';
 
 export interface CreateHabitData {
   name: string;
@@ -70,6 +71,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       return data;
     } catch {
       set((s) => ({ isLoading: false }));
+      showToast('Failed to create habit');
       throw new Error('Failed to create habit');
     }
   },
@@ -117,6 +119,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       refreshAfterXP();
     } catch {
       set((s) => ({ isLoading: false }));
+      showToast('Failed to complete habit');
       throw new Error('Failed to complete habit');
     }
   },
