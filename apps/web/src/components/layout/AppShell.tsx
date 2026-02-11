@@ -2,7 +2,6 @@
 
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
-import { FloatingActionButton } from './FloatingActionButton';
 import { SidebarProvider, useSidebar } from './SidebarContext';
 import { GameEffects } from '@/components/game/GameEffects';
 import { AIChatBar } from '@/components/ai/AIChatBar';
@@ -28,7 +27,6 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
-      <FloatingActionButton />
       <AIChatBar />
     </>
   );
