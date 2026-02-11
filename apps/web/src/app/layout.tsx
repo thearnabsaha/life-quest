@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { CommandPaletteProvider } from '@/components/providers/CommandPaletteProvider';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,7 +24,9 @@ export default function RootLayout({
       <body
         className={`${inter.className} antialiased min-h-screen bg-[#0a0a0a] text-white`}
       >
-        <CommandPaletteProvider>{children}</CommandPaletteProvider>
+        <AuthProvider>
+          <CommandPaletteProvider>{children}</CommandPaletteProvider>
+        </AuthProvider>
       </body>
     </html>
   );

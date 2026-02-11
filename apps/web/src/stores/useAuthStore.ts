@@ -7,6 +7,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
+  isInitialized: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, displayName: string) => Promise<void>;
@@ -19,6 +20,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isLoading: false,
+  isInitialized: false,
   error: null,
 
   login: async (email: string, password: string) => {
@@ -93,7 +95,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   loadUser: async () => {
     const token = getToken();
-    if (!token) return;
+    if (!token) {
+      set({ isInitialized: true });
+      return;
+    }
 
     set({ isLoading: true, error: null });
     try {
@@ -102,6 +107,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: data,
         token,
         isLoading: false,
+        isInitialized: true,
         error: null,
       });
     } catch {
@@ -110,6 +116,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: null,
         token: null,
         isLoading: false,
+        isInitialized: true,
         error: null,
       });
     }

@@ -380,7 +380,7 @@ function PurchaseConfirmModal({
 
 export default function ShopPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const { items, fetchItems, createItem, updateItem, deleteItem, purchaseItem, refundItem } = useShopStore();
   const { profile, fetchProfile } = useProfileStore();
 
@@ -390,10 +390,11 @@ export default function ShopPage() {
   const [filter, setFilter] = useState<'ALL' | 'OWNED' | 'AVAILABLE'>('ALL');
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) { router.replace('/login'); return; }
     fetchItems();
     fetchProfile();
-  }, [user, router, fetchItems, fetchProfile]);
+  }, [user, isInitialized, router, fetchItems, fetchProfile]);
 
   const xpBalance = profile?.totalXP ?? 0;
 
@@ -438,7 +439,7 @@ export default function ShopPage() {
     await deleteItem(id);
   };
 
-  if (!user) return null;
+  if (!isInitialized || !user) return null;
 
   return (
     <AppShell>

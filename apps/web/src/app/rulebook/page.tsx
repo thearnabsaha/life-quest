@@ -219,7 +219,7 @@ function EditableKeyValueTable({
 
 export default function RulebookPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const { config, fetchRulebook, updateRulebook, resetRulebook, isLoading } = useRulebookStore();
 
   const [activeTab, setActiveTab] = useState<'documentation' | 'editor'>('documentation');
@@ -237,9 +237,10 @@ export default function RulebookPage() {
   const [resetConfirm, setResetConfirm] = useState(false);
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) { router.replace('/login'); return; }
     fetchRulebook();
-  }, [user, router, fetchRulebook]);
+  }, [user, isInitialized, router, fetchRulebook]);
 
   useEffect(() => {
     if (config) {
@@ -273,7 +274,7 @@ export default function RulebookPage() {
     });
   };
 
-  if (!user) return null;
+  if (!isInitialized || !user) return null;
 
   const handleSave = async () => {
     setSaving(true);

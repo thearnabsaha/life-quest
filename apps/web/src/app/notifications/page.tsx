@@ -9,7 +9,7 @@ import { Bell, X, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const {
     notifications,
     unreadCount,
@@ -20,14 +20,15 @@ export default function NotificationsPage() {
   } = useNotificationStore();
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) {
       router.replace('/login');
       return;
     }
     fetchNotifications();
-  }, [user, router, fetchNotifications]);
+  }, [user, isInitialized, router, fetchNotifications]);
 
-  if (!user) return null;
+  if (!isInitialized || !user) return null;
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);

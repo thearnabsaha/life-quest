@@ -134,7 +134,7 @@ function MiniCalendarHeatmap({
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const { profile, fetchProfile } = useProfileStore();
   const { logs, fetchLogs } = useXPStore();
   const { categories, fetchCategories } = useCategoryStore();
@@ -150,6 +150,7 @@ export default function DashboardPage() {
   } = useNotificationStore();
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) {
       router.replace('/login');
       return;
@@ -164,6 +165,7 @@ export default function DashboardPage() {
     fetchUnreadCount();
   }, [
     user,
+    isInitialized,
     router,
     fetchProfile,
     fetchLogs,
@@ -201,7 +203,7 @@ export default function DashboardPage() {
     [notifications]
   );
 
-  if (!user) return null;
+  if (!isInitialized || !user) return null;
 
   const activeHabits = habits.filter((h) => h.isActive);
   const todayHabits = activeHabits.slice(0, 5);

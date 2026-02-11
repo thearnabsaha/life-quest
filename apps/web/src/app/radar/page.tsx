@@ -293,11 +293,12 @@ function SubCategoryRadarSection({ category, timeRange }: { category: CategoryWi
 
 export default function RadarPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const { stats, subCategoryRadar, timeRange, isLoading, isLoadingSubs, setTimeRange, fetchStats, fetchSubCategoryRadar } = useRadarStore();
   const { profile, fetchProfile } = useProfileStore();
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) {
       router.replace('/login');
       return;
@@ -305,7 +306,7 @@ export default function RadarPage() {
     fetchStats();
     fetchProfile();
     fetchSubCategoryRadar();
-  }, [user, router, fetchStats, fetchProfile, fetchSubCategoryRadar]);
+  }, [user, isInitialized, router, fetchStats, fetchProfile, fetchSubCategoryRadar]);
 
   const chartData = useMemo(() => {
     const count = stats.length;
@@ -341,7 +342,7 @@ export default function RadarPage() {
     return [...chartData].sort((a, b) => b.xp - a.xp)[0];
   }, [chartData]);
 
-  if (!user) return null;
+  if (!isInitialized || !user) return null;
 
   return (
     <AppShell>

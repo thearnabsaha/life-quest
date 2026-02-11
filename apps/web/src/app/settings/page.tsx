@@ -32,7 +32,7 @@ function SectionCard({
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const { resetProfile } = useProfileStore();
 
   const [autoXP, setAutoXP] = useState(true);
@@ -44,11 +44,12 @@ export default function SettingsPage() {
   const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) {
       router.replace('/login');
       return;
     }
-  }, [user, router]);
+  }, [user, isInitialized, router]);
 
   const handleChangePassword = () => {
     console.log('Change password requested');
@@ -80,7 +81,7 @@ export default function SettingsPage() {
     router.replace('/login');
   };
 
-  if (!user) {
+  if (!isInitialized || !user) {
     return null;
   }
 

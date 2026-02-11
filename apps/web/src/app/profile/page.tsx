@@ -24,7 +24,7 @@ function getCurrentStreak(
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const {
     profile,
     fetchProfile,
@@ -41,6 +41,7 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) {
       router.replace('/login');
       return;
@@ -48,7 +49,7 @@ export default function ProfilePage() {
     fetchProfile();
     fetchCategories();
     fetchHabits();
-  }, [user, router, fetchProfile, fetchCategories, fetchHabits]);
+  }, [user, isInitialized, router, fetchProfile, fetchCategories, fetchHabits]);
 
   useEffect(() => {
     if (profile) {
@@ -91,7 +92,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (!user) {
+  if (!isInitialized || !user) {
     return null;
   }
 
