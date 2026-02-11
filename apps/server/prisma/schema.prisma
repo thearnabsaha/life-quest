@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String            @id @default(cuid())
+  email           String            @unique
+  passwordHash    String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  profile         Profile?
+  categories      Category[]
+  habits          Habit[]
+  xpLogs          XPLog[]
+  calendarEntries CalendarEntry[]
+}
+
+model Profile {
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName         String
+  avatarTier          Int     @default(1)
+  level               Int     @default(1)
+  totalXP             Int     @default(0)
+  rank                String  @default("E")
+  title               String  @default("Novice")
+  manualLevelOverride Int?
+  manualXPOverride    Int?
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  icon          String?
+  color         String?
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  subCategories SubCategory[]
+  xpLogs        XPLog[]
+}
+
+model SubCategory {
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name       String
+  sortOrder  Int      @default(0)
+}
+
+model XPLog {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  amount     Int
+  type       String    // MANUAL, AUTO, BONUS, STREAK
+  source     String?
+  createdAt  DateTime  @default(now())
+}
+
+model Habit {
+  id          String            @id @default(cuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  type        String            // YES_NO, HOURS
+  xpReward    Int               @default(10)
+  streak      Int               @default(0)
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  completions HabitCompletion[]
+}
+
+model HabitCompletion {
+  id          String   @id @default(cuid())
+  habitId     String
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  date        DateTime
+  completed   Boolean  @default(false)
+  hoursLogged Float?
+  xpAwarded   Int      @default(0)
+}
+
+model CalendarEntry {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime
+  totalXP    Int      @default(0)
+  activities Json?
+
+  @@unique([userId, date])
+}

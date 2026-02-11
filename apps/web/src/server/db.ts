@@ -1,0 +1,315 @@
+import crypto from 'crypto';
+
+// ===== Types =====
+export interface DbUser {
+  id: string;
+  email: string;
+  passwordHash: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DbProfile {
+  id: string;
+  userId: string;
+  displayName: string;
+  avatarTier: number;
+  level: number;
+  totalXP: number;
+  rank: string;
+  title: string;
+  manualLevelOverride: number | null;
+  manualXPOverride: number | null;
+}
+
+export interface DbCategory {
+  id: string;
+  userId: string;
+  name: string;
+  icon: string | null;
+  color: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface DbSubCategory {
+  id: string;
+  categoryId: string;
+  name: string;
+  sortOrder: number;
+}
+
+export interface DbXPLog {
+  id: string;
+  userId: string;
+  categoryId: string | null;
+  amount: number;
+  type: string;
+  source: string | null;
+  createdAt: string;
+}
+
+export interface DbHabit {
+  id: string;
+  userId: string;
+  name: string;
+  type: string;
+  xpReward: number;
+  streak: number;
+  isActive: boolean;
+  categoryId: string | null;
+  subCategoryId: string | null;
+  createdAt: string;
+}
+
+export interface DbHabitCompletion {
+  id: string;
+  habitId: string;
+  date: string;
+  completed: boolean;
+  hoursLogged: number | null;
+  xpAwarded: number;
+}
+
+export interface DbCalendarEntry {
+  id: string;
+  userId: string;
+  date: string;
+  totalXP: number;
+  activities: Record<string, unknown> | null;
+}
+
+export interface DbGoal {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  type: string;
+  status: string;
+  categoryId: string | null;
+  targetValue: number;
+  currentValue: number;
+  xpReward: number;
+  deadline: string | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export interface DbNotification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface DbRulebookConfig {
+  id: string;
+  userId: string;
+  mode: string;
+  xpLevelFormula: string;
+  levelRankMap: string;
+  rankTitles: string;
+  artifactThresholds: string;
+  statMultipliers: string;
+  updatedAt: string;
+}
+
+export interface DbShopItem {
+  id: string;
+  userId: string;
+  name: string;
+  description: string | null;
+  cost: number;
+  category: string;
+  rarity: string;
+  imageUrl: string | null;
+  isOwned: boolean;
+  isRedeemed: boolean;
+  refundable: boolean;
+  createdAt: string;
+}
+
+export interface DbRedemptionLog {
+  id: string;
+  userId: string;
+  shopItemId: string;
+  cost: number;
+  action: string;
+  createdAt: string;
+}
+
+export interface Database {
+  users: DbUser[];
+  profiles: DbProfile[];
+  categories: DbCategory[];
+  subCategories: DbSubCategory[];
+  xpLogs: DbXPLog[];
+  habits: DbHabit[];
+  habitCompletions: DbHabitCompletion[];
+  calendarEntries: DbCalendarEntry[];
+  goals: DbGoal[];
+  notifications: DbNotification[];
+  rulebookConfigs: DbRulebookConfig[];
+  shopItems: DbShopItem[];
+  redemptionLogs: DbRedemptionLog[];
+}
+
+// ===== Default empty database =====
+function defaultDb(): Database {
+  return {
+    users: [],
+    profiles: [],
+    categories: [],
+    subCategories: [],
+    xpLogs: [],
+    habits: [],
+    habitCompletions: [],
+    calendarEntries: [],
+    goals: [],
+    notifications: [],
+    rulebookConfigs: [],
+    shopItems: [],
+    redemptionLogs: [],
+  };
+}
+
+// ===== In-memory cache for serverless =====
+let _dbCache: Database | null = null;
+let _dirty = false;
+
+// ===== Postgres helpers (for Vercel deployment) =====
+async function loadFromPostgres(): Promise<Database> {
+  const { sql } = await import('@vercel/postgres');
+  // Ensure table exists
+  await sql`
+    CREATE TABLE IF NOT EXISTS app_data (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      data JSONB NOT NULL DEFAULT '{}'::jsonb
+    )
+  `;
+  const result = await sql`SELECT data FROM app_data WHERE id = 1`;
+  if (result.rows.length === 0) {
+    const db = defaultDb();
+    await sql`INSERT INTO app_data (id, data) VALUES (1, ${JSON.stringify(db)}::jsonb)`;
+    return db;
+  }
+  const parsed = result.rows[0].data as Partial<Database>;
+  const defaults = defaultDb();
+  const merged = { ...defaults, ...parsed } as unknown as Record<string, unknown>;
+  for (const key of Object.keys(defaults)) {
+    if (Array.isArray((defaults as unknown as Record<string, unknown>)[key]) && !Array.isArray(merged[key])) {
+      merged[key] = [];
+    }
+  }
+  return merged as unknown as Database;
+}
+
+async function saveToPostgres(db: Database): Promise<void> {
+  const { sql } = await import('@vercel/postgres');
+  await sql`UPDATE app_data SET data = ${JSON.stringify(db)}::jsonb WHERE id = 1`;
+}
+
+// ===== JSON file helpers (for local development) =====
+function getFilePath(): string {
+  const fs = require('fs');
+  const path = require('path');
+  const DB_PATH = path.join(process.cwd(), 'data', 'db.json');
+  const dir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  return DB_PATH;
+}
+
+function readFromFile(): Database {
+  const fs = require('fs');
+  const dbPath = getFilePath();
+  if (!fs.existsSync(dbPath)) {
+    const db = defaultDb();
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+    return db;
+  }
+  const raw = fs.readFileSync(dbPath, 'utf-8');
+  const parsed = JSON.parse(raw) as Partial<Database>;
+  const defaults = defaultDb();
+  const merged = { ...defaults, ...parsed } as unknown as Record<string, unknown>;
+  for (const key of Object.keys(defaults)) {
+    if (Array.isArray((defaults as unknown as Record<string, unknown>)[key]) && !Array.isArray(merged[key])) {
+      merged[key] = [];
+    }
+  }
+  return merged as unknown as Database;
+}
+
+function writeToFile(db: Database): void {
+  const fs = require('fs');
+  const dbPath = getFilePath();
+  fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+}
+
+// ===== Detect if we're using Postgres =====
+function usePostgres(): boolean {
+  return !!(process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING);
+}
+
+// ===== Public API (stays synchronous for service layer compatibility) =====
+
+/**
+ * Call at the start of each API request. Loads DB into memory.
+ */
+export async function initDb(): Promise<void> {
+  if (usePostgres()) {
+    _dbCache = await loadFromPostgres();
+  } else {
+    _dbCache = readFromFile();
+  }
+  _dirty = false;
+}
+
+/**
+ * Call at the end of each API request. Flushes changes if dirty.
+ */
+export async function flushDb(): Promise<void> {
+  if (_dirty && _dbCache) {
+    if (usePostgres()) {
+      await saveToPostgres(_dbCache);
+    } else {
+      writeToFile(_dbCache);
+    }
+    _dirty = false;
+  }
+}
+
+/**
+ * Synchronous read. In Postgres mode, returns the cached copy loaded by initDb().
+ * In file mode, reads from file (or cache if available).
+ */
+export function readDb(): Database {
+  if (_dbCache) return _dbCache;
+  // Fallback for file mode if initDb wasn't called (e.g., local dev)
+  if (!usePostgres()) {
+    _dbCache = readFromFile();
+    return _dbCache;
+  }
+  throw new Error('DB not initialized. Call initDb() first.');
+}
+
+/**
+ * Synchronous write. Updates in-memory cache and marks as dirty.
+ * In file mode without Postgres, also writes directly to file.
+ */
+export function writeDb(db: Database): void {
+  _dbCache = db;
+  _dirty = true;
+  // In local file mode, also write immediately for safety
+  if (!usePostgres()) {
+    writeToFile(db);
+  }
+}
+
+export function cuid(): string {
+  return 'c' + crypto.randomBytes(12).toString('hex');
+}
