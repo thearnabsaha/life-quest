@@ -212,14 +212,15 @@ async function saveToPostgres(db: Database): Promise<void> {
   await sql`UPDATE app_data SET data = ${JSON.stringify(db)}::jsonb WHERE id = 1`;
 }
 
-// ===== JSON file helpers (for local development) =====
+// ===== JSON file helpers (for local development / Vercel tmp fallback) =====
 function getFilePath(): string {
   const fs = require('fs');
   const path = require('path');
-  const DB_PATH = path.join(process.cwd(), 'data', 'db.json');
-  const dir = path.dirname(DB_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  // On Vercel, the filesystem is read-only except /tmp
+  const baseDir = process.env.VERCEL ? '/tmp' : path.join(process.cwd(), 'data');
+  const DB_PATH = path.join(baseDir, 'db.json');
+  if (!fs.existsSync(baseDir)) {
+    fs.mkdirSync(baseDir, { recursive: true });
   }
   return DB_PATH;
 }
