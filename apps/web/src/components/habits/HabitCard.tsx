@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Pencil, Trash2, Check, X, ChevronRight, FolderOpen } from 'lucide-react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { Pencil, Trash2, Check, X, ChevronRight, FolderOpen, MessageSquare } from 'lucide-react';
 import type { Habit } from '@life-quest/types';
 import { useHabitStore } from '@/stores/useHabitStore';
 import { useCategoryStore } from '@/stores/useCategoryStore';
@@ -17,8 +17,28 @@ export function HabitCard({ habit, selectedDate, onEdit }: HabitCardProps) {
   const [hoursInput, setHoursInput] = useState('');
   const [manualXpInput, setManualXpInput] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const { completeHabit, uncompleteHabit, deleteHabit } = useHabitStore();
+  const [editingComment, setEditingComment] = useState(false);
+  const [commentDraft, setCommentDraft] = useState(habit.comment || '');
+  const commentRef = useRef<HTMLTextAreaElement>(null);
+  const { completeHabit, uncompleteHabit, deleteHabit, updateHabit } = useHabitStore();
   const { categories } = useCategoryStore();
+
+  useEffect(() => {
+    if (editingComment && commentRef.current) {
+      commentRef.current.focus();
+      commentRef.current.setSelectionRange(commentRef.current.value.length, commentRef.current.value.length);
+    }
+  }, [editingComment]);
+
+  const saveComment = async () => {
+    setEditingComment(false);
+    const trimmed = commentDraft.trim();
+    if (trimmed !== (habit.comment || '')) {
+      try {
+        await updateHabit(habit.id, { comment: trimmed || null });
+      } catch { /* handled */ }
+    }
+  };
 
   const breadcrumb = useMemo(() => {
     if (!habit.categoryId) return null;
@@ -159,6 +179,100 @@ export function HabitCard({ habit, selectedDate, onEdit }: HabitCardProps) {
         <StreakCounter count={habit.streak} />
       </div>
 
+      {/* Comment / Note */}
+      <div className="mb-4">
+        {editingComment ? (
+          <div className="space-y-2">
+            <textarea
+              ref={commentRef}
+              value={commentDraft}
+              onChange={(e) => setCommentDraft(e.target.value)}
+              onBlur={saveComment}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  saveComment();
+                }
+                if (e.key === 'Escape') {
+                  setCommentDraft(habit.comment || '');
+                  setEditingComment(false);
+                }
+              }}
+              placeholder="Add a note..."
+              rows={2}
+              className="w-full px-3 py-2 text-sm font-body rounded-sm resize-none focus:outline-none"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '2px solid var(--color-accent)',
+                color: 'var(--color-text-primary)',
+              }}
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setCommentDraft(habit.comment || '');
+                  setEditingComment(false);
+                }}
+                className="px-2 py-0.5 text-xs font-mono"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveComment}
+                className="px-2 py-0.5 text-xs font-mono font-bold rounded-sm"
+                style={{
+                  backgroundColor: 'var(--color-accent)',
+                  color: 'var(--color-bg-base)',
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setCommentDraft(habit.comment || '');
+              setEditingComment(true);
+            }}
+            className="w-full text-left group/comment"
+          >
+            {habit.comment ? (
+              <div
+                className="flex items-start gap-2 px-3 py-2 rounded-sm text-sm font-body transition-all"
+                style={{
+                  backgroundColor: 'color-mix(in srgb, var(--color-accent) 8%, transparent)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                <MessageSquare
+                  className="h-3.5 w-3.5 mt-0.5 shrink-0"
+                  style={{ color: 'var(--color-accent)' }}
+                />
+                <span
+                  className="whitespace-pre-wrap break-words"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  {habit.comment}
+                </span>
+              </div>
+            ) : (
+              <div
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-mono opacity-50 hover:opacity-80 transition-opacity"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                <MessageSquare className="h-3 w-3" />
+                Add note...
+              </div>
+            )}
+          </button>
+        )}
+      </div>
+
       {/* Completion area */}
       {habit.type === 'YES_NO' ? (
         <div className="flex gap-2">
@@ -297,7 +411,7 @@ export function HabitCard({ habit, selectedDate, onEdit }: HabitCardProps) {
                 type="number"
                 min="0"
                 step="0.5"
-                max="24"
+                max="999"
                 value={hoursInput}
                 onChange={(e) => setHoursInput(e.target.value)}
                 placeholder="Hours"

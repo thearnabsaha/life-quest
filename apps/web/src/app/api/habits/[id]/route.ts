@@ -22,6 +22,7 @@ export const PATCH = withDb(async (req: NextRequest, ctx) => {
   if ('isActive' in body) updateData.isActive = body.isActive;
   if ('categoryId' in body) updateData.categoryId = body.categoryId;
   if ('subCategoryId' in body) updateData.subCategoryId = body.subCategoryId;
+  if ('comment' in body) updateData.comment = body.comment;
   const habit = await habitService.updateHabit(id, userId, updateData as any);
   return NextResponse.json(habit);
 });

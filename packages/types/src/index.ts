@@ -71,6 +71,7 @@ export interface Habit {
   isActive: boolean;
   categoryId: string | null;
   subCategoryId: string | null;
+  comment: string | null;
   completions: HabitCompletion[];
 }
 

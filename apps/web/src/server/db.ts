@@ -60,6 +60,7 @@ export interface DbHabit {
   isActive: boolean;
   categoryId: string | null;
   subCategoryId: string | null;
+  comment: string | null;
   createdAt: string;
 }
 
@@ -142,6 +143,27 @@ export interface DbRedemptionLog {
   createdAt: string;
 }
 
+export type TableColumnType = 'checkbox' | 'string' | 'number';
+export type AggregationType = 'none' | 'sum' | 'avg' | 'min' | 'max' | 'count';
+
+export interface DbTableColumn {
+  id: string;
+  userId: string;
+  name: string;
+  type: TableColumnType;
+  aggregation: AggregationType;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface DbTableRow {
+  id: string;
+  userId: string;
+  date: string;
+  values: Record<string, unknown>;
+  createdAt: string;
+}
+
 export interface Database {
   users: DbUser[];
   profiles: DbProfile[];
@@ -156,6 +178,8 @@ export interface Database {
   rulebookConfigs: DbRulebookConfig[];
   shopItems: DbShopItem[];
   redemptionLogs: DbRedemptionLog[];
+  tableColumns: DbTableColumn[];
+  tableRows: DbTableRow[];
 }
 
 // ===== Default empty database =====
@@ -174,6 +198,8 @@ function defaultDb(): Database {
     rulebookConfigs: [],
     shopItems: [],
     redemptionLogs: [],
+    tableColumns: [],
+    tableRows: [],
   };
 }
 

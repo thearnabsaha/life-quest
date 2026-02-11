@@ -6,6 +6,7 @@ import { useCalendarStore } from '@/stores/useCalendarStore';
 import { HeatmapGrid } from '@/components/calendar/HeatmapGrid';
 import { YearNavigator } from '@/components/calendar/YearNavigator';
 import { CalendarStats } from '@/components/calendar/CalendarStats';
+import { NotionTable } from '@/components/calendar/NotionTable';
 
 function getLegendBgClass(level: number): string {
   if (level === 0) return 'bg-zinc-900';
@@ -72,6 +73,11 @@ export default function CalendarPage() {
         </div>
 
         <CalendarStats entries={entries} year={year} />
+
+        {/* Notion-like Data Tracker Table */}
+        <div className="pt-2">
+          <NotionTable />
+        </div>
       </div>
     </AppShell>
   );

@@ -9,6 +9,7 @@ export interface CreateHabitData {
   xpReward?: number;
   categoryId?: string | null;
   subCategoryId?: string | null;
+  comment?: string | null;
 }
 
 export interface UpdateHabitData {
@@ -18,6 +19,7 @@ export interface UpdateHabitData {
   isActive?: boolean;
   categoryId?: string | null;
   subCategoryId?: string | null;
+  comment?: string | null;
 }
 
 interface HabitState {

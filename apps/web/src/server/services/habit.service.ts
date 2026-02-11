@@ -12,6 +12,7 @@ export interface CreateHabitData {
   xpReward?: number;
   categoryId?: string | null;
   subCategoryId?: string | null;
+  comment?: string | null;
 }
 
 export interface UpdateHabitData {
@@ -21,6 +22,7 @@ export interface UpdateHabitData {
   isActive?: boolean;
   categoryId?: string | null;
   subCategoryId?: string | null;
+  comment?: string | null;
 }
 
 export async function getUserHabits(userId: string): Promise<Habit[]> {
@@ -59,6 +61,7 @@ export async function createHabit(userId: string, data: CreateHabitData): Promis
     isActive: true,
     categoryId: data.categoryId ?? null,
     subCategoryId: data.subCategoryId ?? null,
+    comment: data.comment ?? null,
     createdAt: new Date().toISOString(),
   };
 
@@ -87,6 +90,7 @@ export async function updateHabit(
   if (data.isActive !== undefined) habit.isActive = data.isActive;
   if (data.categoryId !== undefined) habit.categoryId = data.categoryId;
   if (data.subCategoryId !== undefined) habit.subCategoryId = data.subCategoryId;
+  if (data.comment !== undefined) habit.comment = data.comment;
   db.habits[idx] = habit;
   writeDb(db);
 
@@ -149,9 +153,11 @@ export async function completeHabit(
   let xpAwarded: number;
   if (habit.type === 'MANUAL' && hoursLogged != null && hoursLogged > 0) {
     xpAwarded = Math.round(hoursLogged);
+  } else if (habit.type === 'HOURS' && hoursLogged && hoursLogged > 0) {
+    // Hours type: base XP * hours logged (no cap), plus streak bonus added separately
+    xpAwarded = Math.round(baseXP * hoursLogged) + bonusXP;
   } else {
-    const hoursMultiplier = habit.type === 'HOURS' && hoursLogged ? Math.min(hoursLogged, 8) : 1;
-    xpAwarded = Math.round((baseXP + bonusXP) * hoursMultiplier);
+    xpAwarded = baseXP + bonusXP;
   }
 
   if (existing) {
@@ -269,7 +275,7 @@ export async function uncompleteHabit(
 }
 
 function toHabitResponse(
-  h: { id: string; userId: string; name: string; type: string; xpReward: number; streak: number; isActive: boolean; categoryId?: string | null; subCategoryId?: string | null },
+  h: { id: string; userId: string; name: string; type: string; xpReward: number; streak: number; isActive: boolean; categoryId?: string | null; subCategoryId?: string | null; comment?: string | null },
   completions: { id: string; habitId: string; date: string; completed: boolean; hoursLogged: number | null; xpAwarded: number }[]
 ): Habit {
   return {
@@ -282,6 +288,7 @@ function toHabitResponse(
     isActive: h.isActive,
     categoryId: h.categoryId ?? null,
     subCategoryId: h.subCategoryId ?? null,
+    comment: h.comment ?? null,
     completions: completions.map((c) => ({
       id: c.id,
       habitId: c.habitId,
