@@ -45,11 +45,12 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const currentYear = new Date().getFullYear();
+    // Force fresh data on every analytics page visit
     fetchCalendar(currentYear);
     fetchLogs(1, 200);
-    fetchCategories();
-    fetchHabits();
-    fetchProfile();
+    fetchCategories(true);
+    fetchHabits(true);
+    fetchProfile(true);
   }, [fetchCalendar, fetchLogs, fetchCategories, fetchHabits, fetchProfile]);
 
   // 1. Profile Overview - XP over time (last 30 days from calendar entries)

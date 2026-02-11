@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Habit, HabitType } from '@life-quest/types';
 import api from '@/lib/api';
+import { refreshAfterXP } from './refreshStores';
 
 export interface CreateHabitData {
   name: string;
@@ -109,6 +110,8 @@ export const useHabitStore = create<HabitState>((set, get) => ({
         habits: s.habits.map((h) => (h.id === id ? data : h)),
         isLoading: false,
       }));
+      // Habit completion awards XP → refresh calendar, XP logs, and profile
+      refreshAfterXP();
     } catch {
       set((s) => ({ isLoading: false }));
       throw new Error('Failed to complete habit');

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import type { XPLog, XPType } from '@life-quest/types';
 import api from '@/lib/api';
+import { useCalendarStore } from './useCalendarStore';
+import { useProfileStore } from './useProfileStore';
 
 interface XPLogsResponse {
   data: XPLog[];
@@ -70,6 +72,10 @@ export const useXPStore = create<XPState>((set, get) => ({
         total: s.total + 1,
         isLoading: false,
       }));
+      // XP logging also creates/updates calendar entries and profile XP
+      const calendarState = useCalendarStore.getState();
+      calendarState.fetchCalendar(calendarState.year).catch(() => {});
+      useProfileStore.getState().fetchProfile(true).catch(() => {});
     } catch {
       set((s) => ({ isLoading: false }));
       throw new Error('Failed to log XP');

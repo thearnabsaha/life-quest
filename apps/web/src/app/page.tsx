@@ -155,12 +155,13 @@ export default function DashboardPage() {
       router.replace('/login');
       return;
     }
-    fetchProfile();
+    // Force fresh data on every dashboard visit
+    fetchProfile(true);
     fetchLogs(1);
-    fetchCategories();
-    fetchHabits();
+    fetchCategories(true);
+    fetchHabits(true);
     fetchCalendar();
-    fetchGoals();
+    fetchGoals(true);
     fetchNotifications(20);
     fetchUnreadCount();
   }, [

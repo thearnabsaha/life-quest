@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Goal, GoalType, GoalStatus } from '@life-quest/types';
 import api from '@/lib/api';
+import { refreshAfterXP } from './refreshStores';
 
 export interface CreateGoalData {
   title: string;
@@ -79,6 +80,10 @@ export const useGoalStore = create<GoalState>((set, get) => ({
         goals: s.goals.map((g) => (g.id === id ? data : g)),
         isLoading: false,
       }));
+      // If status changed to COMPLETED, XP may have been awarded
+      if (updateData.status === 'COMPLETED') {
+        refreshAfterXP();
+      }
     } catch {
       set((s) => ({ isLoading: false }));
       throw new Error('Failed to update goal');
@@ -105,10 +110,15 @@ export const useGoalStore = create<GoalState>((set, get) => ({
       const { data } = await api.post<Goal>(`/goals/${id}/progress`, {
         increment,
       });
+      const wasActive = get().goals.find((g) => g.id === id)?.status === 'ACTIVE';
       set((s) => ({
         goals: s.goals.map((g) => (g.id === id ? data : g)),
         isLoading: false,
       }));
+      // Goal completion awards XP → refresh related stores
+      if (wasActive && data.status === 'COMPLETED') {
+        refreshAfterXP();
+      }
     } catch {
       set((s) => ({ isLoading: false }));
       throw new Error('Failed to update progress');

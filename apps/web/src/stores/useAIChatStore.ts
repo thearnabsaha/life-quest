@@ -1,5 +1,12 @@
 import { create } from 'zustand';
 import api from '@/lib/api';
+import { useCalendarStore } from './useCalendarStore';
+import { useXPStore } from './useXPStore';
+import { useProfileStore } from './useProfileStore';
+import { useHabitStore } from './useHabitStore';
+import { useCategoryStore } from './useCategoryStore';
+import { useGoalStore } from './useGoalStore';
+import { useNotificationStore } from './useNotificationStore';
 
 export interface ChatMessage {
   id: string;
@@ -96,6 +103,20 @@ export const useAIChatStore = create<AIChatState>((set, get) => ({
         messages: [...s.messages, assistantMsg],
         isLoading: false,
       }));
+
+      // AI actions may have created/modified habits, categories, goals, XP, etc.
+      // Refresh all relevant stores so the UI reflects changes
+      if (data.actions_taken && data.actions_taken.length > 0) {
+        const cal = useCalendarStore.getState();
+        cal.fetchCalendar(cal.year).catch(() => {});
+        useXPStore.getState().fetchLogs(1).catch(() => {});
+        useProfileStore.getState().fetchProfile(true).catch(() => {});
+        useHabitStore.getState().fetchHabits(true).catch(() => {});
+        useCategoryStore.getState().fetchCategories(true).catch(() => {});
+        useGoalStore.getState().fetchGoals(true).catch(() => {});
+        useNotificationStore.getState().fetchNotifications(20).catch(() => {});
+        useNotificationStore.getState().fetchUnreadCount(true).catch(() => {});
+      }
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } }; message?: string };
       const errorMsg = e.response?.data?.message ?? e.message ?? 'AI request failed';
