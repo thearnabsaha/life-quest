@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
@@ -19,103 +19,209 @@ import {
   Zap,
   Radar,
   ShoppingBag,
+  MoreHorizontal,
+  X,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useSidebar } from './SidebarContext';
 
-const navItems = [
-  { href: '/', icon: LayoutDashboard, label: 'Dashboard', short: 'Home' },
-  { href: '/profile', icon: User, label: 'Profile', short: 'Profile' },
-  { href: '/categories', icon: FolderOpen, label: 'Categories', short: 'Cats' },
-  { href: '/habits', icon: CheckSquare, label: 'Habits', short: 'Habits' },
-  { href: '/xp', icon: Zap, label: 'XP', short: 'XP' },
-  { href: '/calendar', icon: Calendar, label: 'Calendar', short: 'Calendar' },
-  { href: '/radar', icon: Radar, label: 'Stats Radar', short: 'Radar' },
-  { href: '/goals', icon: Target, label: 'Challenges', short: 'Goals' },
-  { href: '/shop', icon: ShoppingBag, label: 'XP Shop', short: 'Shop' },
-  { href: '/rulebook', icon: BookOpen, label: 'Rulebook', short: 'Rules' },
-  { href: '/analytics', icon: BarChart3, label: 'Analytics', short: 'Stats' },
-  { href: '/settings', icon: Settings, label: 'Settings', short: 'Config' },
+/* ===== Nav items definition ===== */
+const allNavItems = [
+  { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/profile', icon: User, label: 'Profile' },
+  { href: '/categories', icon: FolderOpen, label: 'Categories' },
+  { href: '/habits', icon: CheckSquare, label: 'Habits' },
+  { href: '/xp', icon: Zap, label: 'XP Logs' },
+  { href: '/calendar', icon: Calendar, label: 'Calendar' },
+  { href: '/radar', icon: Radar, label: 'Stats Radar' },
+  { href: '/goals', icon: Target, label: 'Challenges' },
+  { href: '/shop', icon: ShoppingBag, label: 'XP Shop' },
+  { href: '/rulebook', icon: BookOpen, label: 'Rulebook' },
+  { href: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { href: '/settings', icon: Settings, label: 'Settings' },
 ] as const;
 
-/* ===== Mobile Tab Item ===== */
+/* Mobile: 4 primary tabs + "More" button */
+const PRIMARY_TABS = [
+  { href: '/', icon: LayoutDashboard, label: 'Home' },
+  { href: '/habits', icon: CheckSquare, label: 'Habits' },
+  { href: '/xp', icon: Zap, label: 'XP' },
+  { href: '/calendar', icon: Calendar, label: 'Calendar' },
+] as const;
+
+/* Items shown in the "More" drawer */
+const MORE_ITEMS = [
+  { href: '/profile', icon: User, label: 'Profile' },
+  { href: '/categories', icon: FolderOpen, label: 'Categories' },
+  { href: '/radar', icon: Radar, label: 'Stats Radar' },
+  { href: '/goals', icon: Target, label: 'Challenges' },
+  { href: '/shop', icon: ShoppingBag, label: 'XP Shop' },
+  { href: '/rulebook', icon: BookOpen, label: 'Rulebook' },
+  { href: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { href: '/settings', icon: Settings, label: 'Settings' },
+] as const;
+
+/* ===== Mobile Tab ===== */
 function MobileTab({
-  href,
   icon: Icon,
   label,
   isActive,
+  onClick,
+  href,
 }: {
-  href: string;
   icon: LucideIcon;
   label: string;
   isActive: boolean;
+  onClick?: () => void;
+  href?: string;
 }) {
-  return (
-    <Link
-      href={href}
-      className={clsx(
-        'mobile-tab',
-        'flex flex-col items-center justify-center shrink-0 relative',
-        'rounded-xl transition-all duration-200 active:scale-95',
-      )}
-      style={{
-        width: '60px',
-        height: '54px',
-      }}
-    >
-      {/* Active pill indicator */}
+  const inner = (
+    <>
+      {/* Active indicator */}
       {isActive && (
         <span
-          className="absolute top-[2px] left-1/2 -translate-x-1/2 rounded-full"
+          className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full"
           style={{
-            width: '20px',
-            height: '3px',
+            width: '18px',
+            height: '2px',
             backgroundColor: 'var(--color-accent)',
-            boxShadow: '0 0 6px var(--color-accent-glow)',
+            boxShadow: '0 0 8px var(--color-accent-glow)',
           }}
         />
       )}
-
-      {/* Icon container */}
-      <div
-        className={clsx(
-          'flex items-center justify-center rounded-lg transition-all duration-200',
-          isActive ? 'w-8 h-8' : 'w-7 h-7',
-        )}
+      <Icon
         style={{
-          backgroundColor: isActive
-            ? 'color-mix(in srgb, var(--color-accent) 15%, transparent)'
-            : 'transparent',
+          width: '22px',
+          height: '22px',
+          color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
+          transition: 'color 0.15s',
         }}
-      >
-        <Icon
-          className={clsx(
-            'transition-all duration-200',
-            isActive ? 'w-[18px] h-[18px]' : 'w-4 h-4',
-          )}
-          strokeWidth={isActive ? 2.4 : 1.6}
-          style={{
-            color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
-          }}
-        />
-      </div>
-
-      {/* Label */}
+        strokeWidth={isActive ? 2.2 : 1.5}
+      />
       <span
-        className={clsx(
-          'font-body leading-none mt-[2px] transition-all duration-200',
-          isActive ? 'opacity-100' : 'opacity-60',
-        )}
         style={{
-          fontSize: '8.5px',
+          fontSize: '10px',
+          lineHeight: '13px',
+          marginTop: '2px',
           fontWeight: isActive ? 600 : 400,
           color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
-          letterSpacing: '0.03em',
+          opacity: isActive ? 1 : 0.6,
+          transition: 'all 0.15s',
         }}
       >
         {label}
       </span>
-    </Link>
+    </>
+  );
+
+  const cls = 'mobile-tab flex flex-col items-center justify-center flex-1 relative';
+  const style = { minHeight: '52px' };
+
+  if (href) {
+    return (
+      <Link href={href} className={cls} style={style}>
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={onClick} className={cls} style={style}>
+      {inner}
+    </button>
+  );
+}
+
+/* ===== More Drawer ===== */
+function MoreDrawer({
+  open,
+  onClose,
+  pathname,
+}: {
+  open: boolean;
+  onClose: () => void;
+  pathname: string;
+}) {
+  if (!open) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-[60] md:hidden"
+        style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+        onClick={onClose}
+      />
+
+      {/* Drawer sheet */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-[61] md:hidden rounded-t-2xl"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderTop: '1px solid var(--color-border)',
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+          maxHeight: '70vh',
+          overflowY: 'auto',
+        }}
+      >
+        {/* Handle + close */}
+        <div className="flex items-center justify-between px-5 pt-3 pb-2">
+          <span
+            className="font-heading text-[10px] tracking-wider"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
+            MORE
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg"
+            style={{ backgroundColor: 'color-mix(in srgb, var(--color-border) 30%, transparent)' }}
+          >
+            <X className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
+          </button>
+        </div>
+
+        {/* Grid of nav items */}
+        <div className="grid grid-cols-4 gap-1 px-3 pb-2">
+          {MORE_ITEMS.map(({ href, icon: Icon, label }) => {
+            const isActive =
+              pathname === href || (href !== '/' && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={onClose}
+                className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl active:scale-95 transition-transform"
+                style={{
+                  backgroundColor: isActive
+                    ? 'color-mix(in srgb, var(--color-accent) 10%, transparent)'
+                    : 'transparent',
+                }}
+              >
+                <Icon
+                  className="w-6 h-6"
+                  strokeWidth={isActive ? 2 : 1.5}
+                  style={{
+                    color: isActive ? 'var(--color-accent)' : 'var(--color-text-primary)',
+                  }}
+                />
+                <span
+                  className="text-center"
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: isActive ? 600 : 400,
+                    color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                  }}
+                >
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -158,60 +264,62 @@ function DesktopNavLink({
   );
 }
 
-/* ===== Sidebar (Mobile + Desktop) ===== */
+/* ===== Main Sidebar Component ===== */
 export function Sidebar() {
   const pathname = usePathname();
   const { isExpanded, toggle } = useSidebar();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
 
-  // Auto-scroll active item into view on mobile
-  useEffect(() => {
-    if (!scrollRef.current) return;
-    const active = scrollRef.current.querySelector('[data-active="true"]');
-    if (active) {
-      active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }
-  }, [pathname]);
+  const toggleMore = useCallback(() => setMoreOpen((v) => !v), []);
+  const closeMore = useCallback(() => setMoreOpen(false), []);
+
+  // Check if current path is one of the "More" items
+  const isMoreActive = MORE_ITEMS.some(
+    ({ href }) => pathname === href || (href !== '/' && pathname.startsWith(href)),
+  );
 
   return (
     <>
-      {/* ===== Mobile Bottom Tab Bar ===== */}
+      {/* ===== Mobile Bottom Tab Bar — 5 items max ===== */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
         style={{
-          /* Frosted glass effect */
-          backgroundColor: 'color-mix(in srgb, var(--color-bg-surface) 92%, transparent)',
-          backdropFilter: 'blur(16px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-          borderTop: '1px solid color-mix(in srgb, var(--color-border) 60%, transparent)',
+          backgroundColor: 'var(--color-bg-surface)',
+          borderTop: '1px solid var(--color-border)',
         }}
       >
         <div
-          ref={scrollRef}
-          className="flex items-center overflow-x-auto scrollbar-hide"
+          className="flex items-stretch"
           style={{
-            padding: '4px 8px',
-            paddingBottom: 'max(6px, env(safe-area-inset-bottom))',
-            gap: '2px',
-            WebkitOverflowScrolling: 'touch',
+            paddingBottom: 'max(2px, env(safe-area-inset-bottom))',
           }}
         >
-          {navItems.map(({ href, icon, short }) => {
+          {PRIMARY_TABS.map(({ href, icon, label }) => {
             const isActive =
               pathname === href || (href !== '/' && pathname.startsWith(href));
             return (
-              <div key={href} data-active={isActive ? 'true' : undefined}>
-                <MobileTab
-                  href={href}
-                  icon={icon}
-                  label={short}
-                  isActive={isActive}
-                />
-              </div>
+              <MobileTab
+                key={href}
+                href={href}
+                icon={icon}
+                label={label}
+                isActive={isActive}
+              />
             );
           })}
+
+          {/* More button */}
+          <MobileTab
+            icon={MoreHorizontal}
+            label="More"
+            isActive={moreOpen || isMoreActive}
+            onClick={toggleMore}
+          />
         </div>
       </nav>
+
+      {/* More drawer */}
+      <MoreDrawer open={moreOpen} onClose={closeMore} pathname={pathname} />
 
       {/* ===== Desktop Sidebar ===== */}
       <aside
@@ -239,7 +347,7 @@ export function Sidebar() {
         </button>
 
         <nav className="flex-1 flex flex-col py-4 overflow-y-auto">
-          {navItems.map(({ href, icon, label }) => {
+          {allNavItems.map(({ href, icon, label }) => {
             const isActive =
               pathname === href || (href !== '/' && pathname.startsWith(href));
             return (
