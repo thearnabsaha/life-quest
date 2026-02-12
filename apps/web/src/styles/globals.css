@@ -30,6 +30,28 @@
 
   html {
     scroll-behavior: smooth;
+    /* Prevent rubber-band overscroll on iOS — feels more app-like */
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ===== Mobile-first native-app tweaks ===== */
+
+  /* Prevent text selection on interactive elements (app feel) */
+  button, a, [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Faster taps on mobile — remove 300ms delay */
+  a, button, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  /* Mobile tab bar active press effect */
+  .mobile-tab:active {
+    transform: scale(0.92);
+    transition: transform 0.1s;
   }
 
   /* ===== Theme-aware body ===== */

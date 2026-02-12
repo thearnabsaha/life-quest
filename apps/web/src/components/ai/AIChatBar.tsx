@@ -156,7 +156,7 @@ export function AIChatBar() {
             exit={{ scale: 0, opacity: 0 }}
             type="button"
             onClick={toggleOpen}
-            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-14 h-14 flex items-center justify-center border-2 border-neonGreen bg-zinc-950 text-neonGreen shadow-[4px_4px_0px_0px_#39ff14] hover:shadow-[6px_6px_0px_0px_#39ff14] transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            className="fixed bottom-[84px] right-3 md:bottom-6 md:right-6 z-50 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl border-2 border-neonGreen bg-zinc-950 text-neonGreen shadow-[4px_4px_0px_0px_#39ff14] hover:shadow-[6px_6px_0px_0px_#39ff14] transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
             aria-label="Open AI Chat"
           >
             <Sparkles className="w-6 h-6" strokeWidth={2} />
@@ -175,8 +175,8 @@ export function AIChatBar() {
             className={clsx(
               'fixed z-50 border-2 border-neonGreen bg-zinc-950 shadow-[6px_6px_0px_0px_#39ff14] flex flex-col',
               isExpanded
-                ? 'bottom-0 right-0 left-0 top-14 md:bottom-4 md:right-4 md:left-auto md:top-auto md:w-[480px] md:h-[600px]'
-                : 'bottom-20 right-4 md:bottom-4 md:right-4 w-[calc(100vw-2rem)] max-w-[420px] h-[420px]'
+                ? 'bottom-0 right-0 left-0 top-12 md:bottom-4 md:right-4 md:left-auto md:top-auto md:w-[480px] md:h-[600px]'
+                : 'bottom-[76px] right-3 md:bottom-4 md:right-4 w-[calc(100vw-1.5rem)] max-w-[420px] h-[60vh] max-h-[420px]'
             )}
           >
             {/* Header */}

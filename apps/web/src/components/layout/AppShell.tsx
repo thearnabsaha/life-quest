@@ -18,13 +18,16 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
       <main
         className={clsx(
           'min-h-screen transition-[padding,background-color] duration-300',
-          'pt-14',
-          'pl-0 pb-20 md:pb-8 pr-4',
-          isExpanded ? 'md:pl-60' : 'md:pl-16'
+          /* Mobile: 48px header + safe area on top, ~72px nav + safe area on bottom */
+          'pt-12 md:pt-14',
+          'pb-[76px] md:pb-8',
+          'pl-0 pr-0 md:pr-0',
+          isExpanded ? 'md:pl-60' : 'md:pl-16',
         )}
         style={{ backgroundColor: 'var(--color-bg-base)' }}
       >
-        <div className="max-w-7xl mx-auto py-6 px-4 md:px-6">
+        {/* Mobile: tighter padding | Desktop: normal */}
+        <div className="max-w-7xl mx-auto py-4 px-3 md:py-6 md:px-6">
           {children}
         </div>
       </main>

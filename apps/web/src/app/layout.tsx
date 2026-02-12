@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { CommandPaletteProvider } from '@/components/providers/CommandPaletteProvider';
@@ -13,7 +13,22 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Life Quest',
-  description: 'Gamify your life with quests, XP, and achievements',
+  description: 'Gamify your life — RPG-style habit tracking',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Life Quest',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#050510',
 };
 
 export default function RootLayout({
@@ -25,6 +40,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body
         className={`${inter.className} antialiased min-h-screen theme-transition`}
+        style={{ overscrollBehavior: 'none' }}
       >
         <AuthProvider>
           <ThemeProvider>
