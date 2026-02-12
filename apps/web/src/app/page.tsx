@@ -155,7 +155,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isInitialized) return;
     if (!user) {
-      router.replace('/login');
+      router.replace('/landing');
       return;
     }
     if (dashLoaded) return;

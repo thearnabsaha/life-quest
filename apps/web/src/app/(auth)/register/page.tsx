@@ -40,6 +40,9 @@ export default function RegisterPage() {
   const displayError = validationError ?? error;
 
   return (
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: 'var(--color-bg-base)' }}>
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+      <div className="relative z-10 w-full max-w-md px-4">
     <div className="border-2 border-white bg-zinc-900 p-8 shadow-[4px_4px_0_0_rgba(255,255,255,1)]">
       <h1 className="font-heading text-xl text-neonPurple mb-8 text-center tracking-wide">
         CREATE YOUR HUNTER
@@ -146,6 +149,8 @@ export default function RegisterPage() {
           Enter the dungeon
         </Link>
       </p>
+    </div>
+      </div>
     </div>
   );
 }

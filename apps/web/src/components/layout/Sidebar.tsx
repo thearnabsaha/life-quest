@@ -103,13 +103,14 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile: bottom navigation bar */}
+      {/* Mobile: bottom navigation bar - horizontally scrollable */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden">
         <div
-          className="border-t-2 flex items-center justify-around py-2 px-2 theme-transition"
+          className="border-t-2 flex items-center overflow-x-auto py-2 px-1 theme-transition scrollbar-hide"
           style={{
             backgroundColor: 'var(--color-bg-surface)',
             borderColor: 'var(--color-border)',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           {navItems.map(({ href, icon, label }) => {

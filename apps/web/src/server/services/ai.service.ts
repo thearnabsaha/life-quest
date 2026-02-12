@@ -42,7 +42,7 @@ function checkRateLimit(userId: string): void {
 }
 
 interface AIAction {
-  type: 'create_category' | 'create_habit' | 'complete_habit' | 'create_goal' | 'log_xp';
+  type: 'create_category' | 'create_habit' | 'complete_habit' | 'create_goal' | 'log_xp' | 'change_theme' | 'toggle_sound' | 'toggle_music' | 'toggle_animations' | 'navigate' | 'open_command_palette' | 'clear_chat';
   name?: string;
   categoryName?: string;
   subCategories?: string[];
@@ -58,6 +58,9 @@ interface AIAction {
   deadline?: string;
   description?: string;
   hoursLogged?: number;
+  themeId?: string;
+  enabled?: boolean;
+  path?: string;
 }
 
 interface AIResponse {
@@ -108,11 +111,25 @@ CURRENT USER CONTEXT:
 - Active Challenges: ${JSON.stringify(goalData)}
 
 YOUR CAPABILITIES (actions you can take):
+
+=== DATA ACTIONS (server-side) ===
 1. create_category: Create a category with optional subcategories, icon, color
 2. create_habit: Create a habit linked to a category/subcategory
 3. complete_habit: Mark a habit as done for today (fuzzy match by name)
 4. create_goal: Create a challenge (SHORT_TERM or LONG_TERM)
 5. log_xp: Log manual XP to a category
+
+=== APP CONTROL ACTIONS (client-side) ===
+6. change_theme: Change the app theme. Available themes: solo-leveling, shadow-monarch, neon-cyberpunk, hunters-gate, crimson-knight, emerald-sage, ocean-abyss, golden-srank, sakura-dream, frost-walker
+7. toggle_sound: Enable or disable sound effects
+8. toggle_music: Enable or disable background music
+9. toggle_animations: Enable or disable UI animations
+10. navigate: Navigate to a page in the app
+11. open_command_palette: Open the command palette
+12. clear_chat: Clear the AI chat history
+
+AVAILABLE NAVIGATION PATHS:
+- / (Dashboard), /profile, /categories, /habits, /xp (XP Logs), /calendar, /radar (Stats Radar), /goals (Challenges), /shop (XP Shop), /rulebook, /analytics, /settings, /notifications
 
 IMPORTANT - ASK BEFORE CREATING:
 When the user asks you to create habits, challenges, or categories, you MUST ask them the following details if they haven't already provided them:
@@ -120,7 +137,7 @@ When the user asks you to create habits, challenges, or categories, you MUST ask
 - For challenges: "How much XP should completing this challenge reward? What's the target value? Is it short-term or long-term? Any deadline?"
 - For categories: "What icon (emoji) and color should I use? Any subcategories to add?"
 Set needs_clarification to true and ask a CONCISE question covering ALL missing info in one go. DO NOT create anything without knowing the XP reward.
-The ONLY exception is when completing habits -- just do it immediately.
+The ONLY exception is when completing habits or app control actions (theme, sound, navigate, etc.) -- just do those immediately.
 
 RULES:
 - Always respond in JSON format with this exact structure:
@@ -138,11 +155,21 @@ RULES:
 - For complete_habit actions: { "type": "complete_habit", "name": "habit name to fuzzy match", "hoursLogged": optional_number }
 - For create_goal actions: { "type": "create_goal", "name": "...", "goalType": "SHORT_TERM"|"LONG_TERM", "targetValue": number, "xpReward": number, "categoryName": "...", "deadline": "YYYY-MM-DD", "description": "..." }
 - For log_xp actions: { "type": "log_xp", "amount": number, "categoryName": "...", "source": "reason" }
+- For change_theme actions: { "type": "change_theme", "themeId": "solo-leveling" } -- use one of the available theme IDs
+- For toggle_sound actions: { "type": "toggle_sound", "enabled": true/false }
+- For toggle_music actions: { "type": "toggle_music", "enabled": true/false }
+- For toggle_animations actions: { "type": "toggle_animations", "enabled": true/false }
+- For navigate actions: { "type": "navigate", "path": "/settings" } -- use one of the available paths
+- For open_command_palette: { "type": "open_command_palette" }
+- For clear_chat: { "type": "clear_chat" }
 - Max ${MAX_ACTIONS_PER_MESSAGE} actions per response.
 - NEVER modify XP formulas, rulebook settings, or delete anything.
 - Be concise, friendly, and game-themed in your responses. Use RPG language.
 - If the user says they did multiple things, create multiple complete_habit or log_xp actions.
-- When the user provides all required info (especially XP amounts), proceed to create immediately without further questions.`;
+- When the user provides all required info (especially XP amounts), proceed to create immediately without further questions.
+- For app control actions (theme, sound, music, animations, navigation), execute them immediately without asking for clarification.
+- If the user asks to "make it dark" or "change colors", suggest appropriate themes.
+- If the user asks "what can you do?" or "help", list your capabilities in a friendly way.`;
 }
 
 async function callGroq(
@@ -319,6 +346,29 @@ async function executeActions(userId: string, actions: AIAction[]): Promise<Acti
           break;
         }
 
+        // Client-side actions - just pass them through as successful
+        case 'change_theme':
+          results.push({ type: 'change_theme', success: true, detail: `Theme changed to "${action.themeId}"` });
+          break;
+        case 'toggle_sound':
+          results.push({ type: 'toggle_sound', success: true, detail: `Sound effects ${action.enabled ? 'enabled' : 'disabled'}` });
+          break;
+        case 'toggle_music':
+          results.push({ type: 'toggle_music', success: true, detail: `Background music ${action.enabled ? 'enabled' : 'disabled'}` });
+          break;
+        case 'toggle_animations':
+          results.push({ type: 'toggle_animations', success: true, detail: `Animations ${action.enabled ? 'enabled' : 'disabled'}` });
+          break;
+        case 'navigate':
+          results.push({ type: 'navigate', success: true, detail: `Navigating to ${action.path}` });
+          break;
+        case 'open_command_palette':
+          results.push({ type: 'open_command_palette', success: true, detail: 'Opening command palette' });
+          break;
+        case 'clear_chat':
+          results.push({ type: 'clear_chat', success: true, detail: 'Chat history cleared' });
+          break;
+
         default:
           results.push({ type: action.type, success: false, detail: `Unknown action type: ${action.type}` });
       }
@@ -378,9 +428,15 @@ export async function chat(
     actionResults = await executeActions(userId, aiResponse.actions);
   }
 
+  // Extract client-side actions to pass to the frontend
+  const clientActions = aiResponse.actions.filter((a) =>
+    ['change_theme', 'toggle_sound', 'toggle_music', 'toggle_animations', 'navigate', 'open_command_palette', 'clear_chat'].includes(a.type)
+  );
+
   return {
     response: aiResponse.response,
     actions_taken: actionResults,
+    client_actions: clientActions,
     needs_clarification: aiResponse.needs_clarification,
     clarification_question: aiResponse.clarification_question,
     model_used: model,

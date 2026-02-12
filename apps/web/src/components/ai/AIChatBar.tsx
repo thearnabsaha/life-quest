@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   MessageSquare,
   Send,
@@ -16,7 +17,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAIChatStore, type ChatMessage } from '@/stores/useAIChatStore';
+import { useAIChatStore, setAINavigate, setAICommandPalette, type ChatMessage } from '@/stores/useAIChatStore';
 import clsx from 'clsx';
 
 function ActionBadge({ type, success, detail }: { type: string; success: boolean; detail: string }) {
@@ -94,12 +95,24 @@ function MessageBubble({ message }: { message: ChatMessage }) {
 }
 
 export function AIChatBar() {
+  const router = useRouter();
   const { messages, isLoading, isOpen, toggleOpen, sendMessage, clearChat } =
     useAIChatStore();
   const [input, setInput] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Register AI callbacks for navigation and command palette
+  useEffect(() => {
+    setAINavigate((path: string) => {
+      router.push(path);
+    });
+    setAICommandPalette(() => {
+      // Simulate Ctrl+K to open command palette
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+    });
+  }, [router]);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -218,15 +231,17 @@ export function AIChatBar() {
                       AI QUEST ASSISTANT
                     </p>
                     <p className="font-body text-xs text-zinc-600 leading-relaxed">
-                      Tell me what you did today, ask me to create categories,
-                      habits, or challenges. I&apos;ll handle the rest.
+                      I can create categories, habits &amp; challenges, change themes,
+                      toggle audio, navigate pages, and more!
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {[
                       'I did my morning run',
-                      'Create Health category',
-                      'Add a study challenge',
+                      'Switch to Cyberpunk theme',
+                      'Turn on the music',
+                      'Go to analytics',
+                      'What can you do?',
                     ].map((suggestion) => (
                       <button
                         key={suggestion}
