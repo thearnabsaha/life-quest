@@ -52,54 +52,54 @@ export default function GoalsPage() {
 
   return (
     <AppShell>
-      <div className="space-y-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="font-heading text-xl text-white md:text-2xl">CHALLENGES</h1>
+      <div className="space-y-5 sm:space-y-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="font-heading text-base sm:text-xl text-white md:text-2xl">CHALLENGES</h1>
           <button
             type="button"
             onClick={handleAdd}
-            className="flex items-center gap-2 border-[2px] border-white bg-neonGreen px-6 py-3 font-body text-sm font-bold uppercase tracking-wider text-black transition-all hover:bg-[#2dd610] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-            style={{ boxShadow: '6px 6px 0px 0px #fff' }}
+            className="flex items-center justify-center gap-2 border-[2px] border-white bg-neonGreen px-4 sm:px-6 py-2.5 sm:py-3 font-body text-xs sm:text-sm font-bold uppercase tracking-wider text-black rounded-sm transition-all hover:bg-[#2dd610] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            style={{ boxShadow: '4px 4px 0px 0px #fff' }}
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
             Add Challenge
           </button>
         </div>
 
         {isLoading ? (
           <div
-            className="border-[3px] border-white bg-zinc-900 p-12 text-center"
-            style={{ boxShadow: '6px 6px 0px 0px #39ff14' }}
+            className="border-[2px] sm:border-[3px] border-white bg-zinc-900 p-8 sm:p-12 text-center rounded-md"
+            style={{ boxShadow: '4px 4px 0px 0px #39ff14' }}
           >
             <p className="font-body text-zinc-400">Loading challenges...</p>
           </div>
         ) : goals.length === 0 ? (
           <div
-            className="border-[3px] border-white bg-zinc-900 p-12 text-center"
-            style={{ boxShadow: '6px 6px 0px 0px #39ff14' }}
+            className="border-[2px] sm:border-[3px] border-white bg-zinc-900 p-8 sm:p-12 text-center rounded-md"
+            style={{ boxShadow: '4px 4px 0px 0px #39ff14' }}
           >
-            <p className="mb-4 font-body text-zinc-400">
+            <p className="mb-4 font-body text-sm text-zinc-400">
               No challenges yet. Set your quests and track progress!
             </p>
             <button
               type="button"
               onClick={handleAdd}
-              className="border-[2px] border-white bg-neonGreen px-6 py-3 font-body text-sm font-bold text-black"
-              style={{ boxShadow: '4px 4px 0px 0px #fff' }}
+              className="border-[2px] border-white bg-neonGreen px-5 sm:px-6 py-2.5 sm:py-3 font-body text-xs sm:text-sm font-bold text-black rounded-sm"
+              style={{ boxShadow: '3px 3px 0px 0px #fff' }}
             >
               Add Your First Challenge
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-2">
             <div
-              className="border-[3px] border-white bg-zinc-900 p-6"
-              style={{ boxShadow: '6px 6px 0px 0px #ffe600' }}
+              className="border-[2px] sm:border-[3px] border-white bg-zinc-900 p-3.5 sm:p-6 rounded-md"
+              style={{ boxShadow: '4px 4px 0px 0px #ffe600' }}
             >
-              <h2 className="mb-4 font-heading text-sm text-neonYellow">
+              <h2 className="mb-3 sm:mb-4 font-heading text-[10px] sm:text-sm text-neonYellow">
                 LONG-TERM CHALLENGES
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {longTermGoals.length === 0 ? (
                   <p className="font-body text-sm text-zinc-500">
                     No long-term challenges yet.
@@ -118,13 +118,13 @@ export default function GoalsPage() {
             </div>
 
             <div
-              className="border-[3px] border-white bg-zinc-900 p-6"
-              style={{ boxShadow: '6px 6px 0px 0px #00d4ff' }}
+              className="border-[2px] sm:border-[3px] border-white bg-zinc-900 p-3.5 sm:p-6 rounded-md"
+              style={{ boxShadow: '4px 4px 0px 0px #00d4ff' }}
             >
-              <h2 className="mb-4 font-heading text-sm text-neonBlue">
+              <h2 className="mb-3 sm:mb-4 font-heading text-[10px] sm:text-sm text-neonBlue">
                 SHORT-TERM CHALLENGES
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {shortTermGoals.length === 0 ? (
                   <p className="font-body text-sm text-zinc-500">
                     No short-term challenges yet.

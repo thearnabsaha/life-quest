@@ -118,10 +118,31 @@
     border-color: var(--color-border-accent) !important;
   }
 
+  /* Map placeholder text for light themes */
+  .placeholder\:text-zinc-500::placeholder,
+  .placeholder\:text-zinc-600::placeholder {
+    color: var(--color-text-muted) !important;
+  }
+
+  /* Primary text — maps 'white' to theme text so light themes work */
+  .text-white {
+    color: var(--color-text-primary) !important;
+  }
+
+  .text-zinc-100,
+  .text-zinc-200,
+  .text-zinc-300 {
+    color: var(--color-text-primary) !important;
+  }
+
   /* Muted text */
   .text-zinc-400,
   .text-zinc-500 {
     color: var(--color-text-muted) !important;
+  }
+
+  .text-zinc-600 {
+    color: color-mix(in srgb, var(--color-text-muted) 70%, transparent) !important;
   }
 
   /* Shadow overrides for cards */

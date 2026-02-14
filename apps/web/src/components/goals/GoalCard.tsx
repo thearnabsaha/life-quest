@@ -75,114 +75,121 @@ export function GoalCard({ goal, categoryName, onEdit }: GoalCardProps) {
 
   return (
     <div
-      className="border-[3px] border-white bg-zinc-900 p-5"
-      style={{ boxShadow: '6px 6px 0px 0px #39ff14' }}
+      className="border-[2px] sm:border-[3px] border-white bg-zinc-900 p-3.5 sm:p-5 rounded-md"
+      style={{ boxShadow: '4px 4px 0px 0px #39ff14' }}
     >
-      <div className="mb-4 flex items-start justify-between">
-        <div>
-          <h3 className="font-body text-base font-semibold text-white">{goal.title}</h3>
+      {/* Header: Title + Action buttons */}
+      <div className="mb-3 sm:mb-4 flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h3 className="font-body text-sm sm:text-base font-semibold text-white truncate">{goal.title}</h3>
           {goal.description && (
-            <p className="mt-1 font-body text-sm text-zinc-400">{goal.description}</p>
+            <p className="mt-1 font-body text-xs sm:text-sm text-zinc-400 line-clamp-2">{goal.description}</p>
           )}
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
             <StatusBadge status={goal.status} />
-            <span className="font-body text-xs text-neonGreen">+{goal.xpReward} XP</span>
+            <span className="font-body text-[10px] sm:text-xs text-neonGreen">+{goal.xpReward} XP</span>
             {categoryName && (
               <span
-                className="border-[2px] border-zinc-600 px-2 py-0.5 font-mono text-xs text-zinc-400"
+                className="border-[2px] border-zinc-600 px-1.5 sm:px-2 py-0.5 font-mono text-[10px] sm:text-xs text-zinc-400"
                 style={{ boxShadow: '2px 2px 0px 0px #333' }}
               >
                 {categoryName}
               </span>
             )}
             {deadlineFormatted && (
-              <span className="font-body text-xs text-zinc-500">
+              <span className="font-body text-[10px] sm:text-xs text-zinc-500">
                 Due: {deadlineFormatted}
               </span>
             )}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
             onClick={() => onEdit(goal)}
-            className="border-[2px] border-white bg-zinc-800 p-2 text-white transition-all hover:bg-zinc-700"
-            style={{ boxShadow: '3px 3px 0px 0px #00d4ff' }}
+            className="border-[2px] border-white bg-zinc-800 p-1.5 sm:p-2 text-white transition-all hover:bg-zinc-700 rounded-sm"
+            style={{ boxShadow: '2px 2px 0px 0px #00d4ff' }}
             aria-label="Edit challenge"
           >
-            <Pencil className="h-4 w-4" />
+            <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className="border-[2px] border-white bg-zinc-800 p-2 text-neonPink transition-all hover:bg-zinc-700"
-            style={{ boxShadow: '3px 3px 0px 0px #ff2d95' }}
+            className="border-[2px] border-white bg-zinc-800 p-1.5 sm:p-2 text-neonPink transition-all hover:bg-zinc-700 rounded-sm"
+            style={{ boxShadow: '2px 2px 0px 0px #ff2d95' }}
             aria-label="Delete challenge"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
         </div>
       </div>
 
-      <div className="mb-4">
-        <div className="mb-1 flex justify-between font-body text-xs text-zinc-400">
+      {/* Progress bar */}
+      <div className="mb-3 sm:mb-4">
+        <div className="mb-1 flex justify-between font-body text-[10px] sm:text-xs text-zinc-400">
           <span>
             {goal.currentValue} / {goal.targetValue}
           </span>
           <span>{Math.round(progressPercent)}%</span>
         </div>
         <div
-          className="h-4 w-full border-[2px] border-white bg-zinc-950"
-          style={{ boxShadow: '3px 3px 0px 0px #fff' }}
+          className="h-3 sm:h-4 w-full border-[2px] border-white bg-zinc-950 rounded-sm overflow-hidden"
+          style={{ boxShadow: '2px 2px 0px 0px #fff' }}
         >
           <div
-            className="h-full bg-neonGreen transition-all"
+            className="h-full bg-neonGreen transition-all rounded-sm"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </div>
 
+      {/* Update Progress section — responsive layout */}
       {goal.status === 'ACTIVE' && (
-        <div className="flex gap-2">
+        <div>
           {showProgressInput ? (
-            <>
+            <div className="space-y-2">
+              {/* Input — always full width */}
               <input
                 type="number"
                 min="1"
                 step="1"
                 value={progressInput}
                 onChange={(e) => setProgressInput(e.target.value)}
-                placeholder="Increment"
-                className="flex-1 border-[2px] border-white bg-zinc-950 px-4 py-3 font-body text-white placeholder:text-zinc-500 focus:outline-none"
-                style={{ boxShadow: '3px 3px 0px 0px #fff' }}
+                placeholder="Enter increment value..."
+                className="w-full border-[2px] border-white bg-zinc-950 px-3 py-2.5 sm:px-4 sm:py-3 font-body text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-neonGreen rounded-sm transition-colors"
+                style={{ boxShadow: '2px 2px 0px 0px #fff' }}
               />
-              <button
-                type="button"
-                onClick={handleUpdateProgress}
-                disabled={!progressInput || parseInt(progressInput, 10) <= 0}
-                className="border-[2px] border-white bg-neonGreen px-4 py-3 font-body text-sm font-bold text-black disabled:opacity-50"
-                style={{ boxShadow: '4px 4px 0px 0px #fff' }}
-              >
-                Update
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowProgressInput(false);
-                  setProgressInput('');
-                }}
-                className="border-[2px] border-white bg-zinc-800 px-4 py-3 font-body text-sm font-semibold text-white"
-                style={{ boxShadow: '3px 3px 0px 0px #fff' }}
-              >
-                Cancel
-              </button>
-            </>
+              {/* Buttons row */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleUpdateProgress}
+                  disabled={!progressInput || parseInt(progressInput, 10) <= 0}
+                  className="flex-1 border-[2px] border-white bg-neonGreen px-3 py-2.5 sm:px-4 sm:py-3 font-body text-xs sm:text-sm font-bold text-black disabled:opacity-50 rounded-sm active:translate-y-[1px] active:shadow-none transition-all"
+                  style={{ boxShadow: '3px 3px 0px 0px #fff' }}
+                >
+                  Update
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProgressInput(false);
+                    setProgressInput('');
+                  }}
+                  className="flex-1 border-[2px] border-white bg-zinc-800 px-3 py-2.5 sm:px-4 sm:py-3 font-body text-xs sm:text-sm font-semibold text-white rounded-sm active:translate-y-[1px] active:shadow-none transition-all"
+                  style={{ boxShadow: '3px 3px 0px 0px #fff' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           ) : (
             <button
               type="button"
               onClick={() => setShowProgressInput(true)}
-              className="w-full border-[2px] border-white bg-zinc-800 py-3 font-body text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-zinc-700"
-              style={{ boxShadow: '4px 4px 0px 0px #39ff14' }}
+              className="w-full border-[2px] border-white bg-zinc-800 py-2.5 sm:py-3 font-body text-xs sm:text-sm font-bold uppercase tracking-wider text-white rounded-sm transition-all hover:bg-zinc-700 active:translate-y-[1px] active:shadow-none"
+              style={{ boxShadow: '3px 3px 0px 0px #39ff14' }}
             >
               Update Progress
             </button>
@@ -190,24 +197,25 @@ export function GoalCard({ goal, categoryName, onEdit }: GoalCardProps) {
         </div>
       )}
 
+      {/* Delete confirmation modal */}
       {showDeleteConfirm && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
           onClick={() => setShowDeleteConfirm(false)}
         >
           <div
-            className="w-full max-w-sm border-[3px] border-white bg-zinc-900 p-6"
-            style={{ boxShadow: '8px 8px 0px 0px #ff2d95' }}
+            className="w-full max-w-sm border-[3px] border-white bg-zinc-900 p-5 sm:p-6 rounded-md"
+            style={{ boxShadow: '6px 6px 0px 0px #ff2d95' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="mb-6 font-body text-sm text-white">
+            <p className="mb-5 sm:mb-6 font-body text-sm text-white">
               Delete &quot;{goal.title}&quot;? Progress will be lost.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 border-[2px] border-white bg-zinc-800 px-4 py-2 font-body text-sm font-semibold text-white"
+                className="flex-1 border-[2px] border-white bg-zinc-800 px-3 sm:px-4 py-2.5 font-body text-xs sm:text-sm font-semibold text-white rounded-sm"
                 style={{ boxShadow: '3px 3px 0px 0px #fff' }}
               >
                 Cancel
@@ -215,7 +223,7 @@ export function GoalCard({ goal, categoryName, onEdit }: GoalCardProps) {
               <button
                 type="button"
                 onClick={handleDelete}
-                className="flex-1 border-[2px] border-white bg-neonPink px-4 py-2 font-body text-sm font-semibold text-black"
+                className="flex-1 border-[2px] border-white bg-neonPink px-3 sm:px-4 py-2.5 font-body text-xs sm:text-sm font-semibold text-black rounded-sm"
                 style={{ boxShadow: '3px 3px 0px 0px #fff' }}
               >
                 Delete
