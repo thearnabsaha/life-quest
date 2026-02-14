@@ -92,7 +92,7 @@ export const useXPStore = create<XPState>((set, get) => ({
         logs: s.logs.filter((l) => l.id !== logId),
         total: Math.max(0, s.total - 1),
       }));
-      // Refresh profile and calendar since XP was subtracted
+      // Refresh profile and calendar since XP was subtract
       useProfileStore.getState().fetchProfile(true).catch(() => {});
       const calendarState = useCalendarStore.getState();
       calendarState.fetchCalendar(calendarState.year).catch(() => {});
