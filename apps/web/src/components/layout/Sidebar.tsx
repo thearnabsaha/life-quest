@@ -45,16 +45,16 @@ const allNavItems = [
 const PRIMARY_TABS = [
   { href: '/', icon: LayoutDashboard, label: 'Home' },
   { href: '/habits', icon: CheckSquare, label: 'Habits' },
-  { href: '/xp', icon: Zap, label: 'XP' },
-  { href: '/calendar', icon: Calendar, label: 'Calendar' },
+  { href: '/goals', icon: Target, label: 'Challenges' },
+  { href: '/radar', icon: Radar, label: 'Radar' },
 ] as const;
 
 /* Items shown in the "More" drawer */
 const MORE_ITEMS = [
+  { href: '/xp', icon: Zap, label: 'XP Logs' },
+  { href: '/calendar', icon: Calendar, label: 'Calendar' },
   { href: '/profile', icon: User, label: 'Profile' },
   { href: '/categories', icon: FolderOpen, label: 'Categories' },
-  { href: '/radar', icon: Radar, label: 'Stats Radar' },
-  { href: '/goals', icon: Target, label: 'Challenges' },
   { href: '/shop', icon: ShoppingBag, label: 'XP Shop' },
   { href: '/rulebook', icon: BookOpen, label: 'Rulebook' },
   { href: '/analytics', icon: BarChart3, label: 'Analytics' },
@@ -282,18 +282,14 @@ export function Sidebar() {
     <>
       {/* ===== Mobile Bottom Tab Bar — 5 items max ===== */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 md:hidden fixed-gpu"
         style={{
           backgroundColor: 'var(--color-bg-surface)',
           borderTop: '1px solid var(--color-border)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
-        <div
-          className="flex items-stretch"
-          style={{
-            paddingBottom: 'max(2px, env(safe-area-inset-bottom))',
-          }}
-        >
+        <div className="flex items-stretch">
           {PRIMARY_TABS.map(({ href, icon, label }) => {
             const isActive =
               pathname === href || (href !== '/' && pathname.startsWith(href));

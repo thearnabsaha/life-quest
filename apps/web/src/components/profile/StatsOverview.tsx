@@ -19,14 +19,14 @@ interface StatCardProps {
 function StatCard({ icon, value, label, accentColor }: StatCardProps) {
   return (
     <div
-      className="border-2 border-white bg-zinc-900 p-4 shadow-[6px_6px_0px_0px_rgba(255,255,255,0.3)]"
-      style={{ borderLeftColor: accentColor, borderLeftWidth: 4 }}
+      className="border-2 border-white bg-zinc-900 p-3 sm:p-4 rounded-md shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] sm:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)]"
+      style={{ borderLeftColor: accentColor, borderLeftWidth: 3 }}
     >
-      <div className="flex items-center gap-2 mb-1" style={{ color: accentColor }}>
+      <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1" style={{ color: accentColor }}>
         {icon}
-        <span className="font-mono text-sm font-medium">{value}</span>
+        <span className="font-mono text-xs sm:text-sm font-medium">{value}</span>
       </div>
-      <span className="font-body text-xs text-zinc-400 uppercase tracking-wider">
+      <span className="font-body text-[10px] sm:text-xs text-zinc-400 uppercase tracking-wider">
         {label}
       </span>
     </div>
@@ -60,7 +60,7 @@ export function StatsOverview({
   currentStreak,
 }: StatsOverviewProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4">
       <StatCard
         icon={<Zap className="w-4 h-4" strokeWidth={2} />}
         value={totalXP.toLocaleString()}

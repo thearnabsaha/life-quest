@@ -18,9 +18,9 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
       <main
         className={clsx(
           'min-h-screen transition-[padding,background-color] duration-300',
-          /* Mobile: 48px header, ~58px nav + safe-area bottom */
-          'pt-12 md:pt-14',
-          'pb-[68px] md:pb-8',
+          /* Safe-area-aware padding from globals.css */
+          'pt-topbar',
+          'pb-bottomnav',
           'pl-0 pr-0 md:pr-0',
           isExpanded ? 'md:pl-60' : 'md:pl-16',
         )}

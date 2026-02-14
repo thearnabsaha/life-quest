@@ -255,12 +255,12 @@ export default function DashboardPage() {
   const currentStreak = getCurrentStreak(profile, habits);
 
   const cardClass =
-    'border-2 border-zinc-700 bg-zinc-900 p-5 transition-all hover:border-zinc-500';
-  const sectionTitle = 'font-heading text-xs uppercase tracking-wider mb-4';
+    'border-2 border-zinc-700 bg-zinc-900 p-4 sm:p-5 rounded-md transition-all hover:border-zinc-500';
+  const sectionTitle = 'font-heading text-xs uppercase tracking-wider mb-3 sm:mb-4';
 
   return (
     <AppShell>
-      <div className="space-y-6">
+      <div className="space-y-5 md:space-y-6">
         {/* Profile Card */}
         {profile ? (
           <ProfileCard profile={profile} />
@@ -270,26 +270,34 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Quick Actions - cleaner grid */}
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-          {[
-            { href: '/xp', icon: Zap, label: 'Log XP', color: '#39ff14' },
-            { href: '/habits', icon: CheckSquare, label: 'Habits', color: '#ffe600' },
-            { href: '/goals', icon: Target, label: 'Challenges', color: '#00d4ff' },
-            { href: '/radar', icon: Radar, label: 'Stats', color: '#bf00ff' },
-            { href: '/shop', icon: ShoppingBag, label: 'Shop', color: '#ff2d95' },
-            { href: '/rulebook', icon: BookOpen, label: 'Rules', color: '#ffe600' },
-          ].map(({ href, icon: Icon, label, color }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex flex-col items-center gap-2 border-2 border-zinc-700 bg-zinc-900 p-4 transition-all hover:border-opacity-80"
-              style={{ '--hover-color': color } as React.CSSProperties}
-            >
-              <Icon className="h-6 w-6" style={{ color }} strokeWidth={2} />
-              <span className="font-body text-[10px] text-zinc-400">{label}</span>
-            </Link>
-          ))}
+        {/* Quick Actions */}
+        <div>
+          <h2
+            className="font-heading text-[10px] uppercase tracking-wider mb-3"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
+            QUICK ACTIONS
+          </h2>
+          <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6 sm:gap-3">
+            {[
+              { href: '/xp', icon: Zap, label: 'Log XP', color: '#39ff14' },
+              { href: '/habits', icon: CheckSquare, label: 'Habits', color: '#ffe600' },
+              { href: '/goals', icon: Target, label: 'Challenges', color: '#00d4ff' },
+              { href: '/radar', icon: Radar, label: 'Stats', color: '#bf00ff' },
+              { href: '/shop', icon: ShoppingBag, label: 'Shop', color: '#ff2d95' },
+              { href: '/rulebook', icon: BookOpen, label: 'Rules', color: '#ffe600' },
+            ].map(({ href, icon: Icon, label, color }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex flex-col items-center justify-center gap-1.5 border-2 border-zinc-700 bg-zinc-900 py-3 px-2 sm:gap-2 sm:p-4 rounded-md transition-all hover:border-opacity-80 active:scale-95"
+                style={{ '--hover-color': color } as React.CSSProperties}
+              >
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color }} strokeWidth={2} />
+                <span className="font-body text-[10px] text-zinc-400 leading-tight">{label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Categories Overview */}
@@ -300,7 +308,7 @@ export default function DashboardPage() {
               View all <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
             {categoriesWithXP.length === 0 ? (
               <p className="col-span-full font-body text-sm text-zinc-500">
                 No categories yet.
@@ -315,14 +323,14 @@ export default function DashboardPage() {
                   <Link
                     key={cat.id}
                     href="/categories"
-                    className="flex flex-col gap-1 border-2 border-zinc-800 bg-zinc-950 p-3 transition-all hover:bg-zinc-900"
+                    className="flex flex-col gap-1 border-2 border-zinc-800 bg-zinc-950 p-3 rounded-md transition-all hover:bg-zinc-900 active:scale-[0.98]"
                     style={{ borderLeftColor: hexColor, borderLeftWidth: 3 }}
                   >
-                    <span className="text-lg">{cat.icon || '📁'}</span>
-                    <span className="font-body text-sm font-medium text-white">
+                    <span className="text-base sm:text-lg">{cat.icon || '📁'}</span>
+                    <span className="font-body text-xs sm:text-sm font-medium text-white truncate">
                       {cat.name}
                     </span>
-                    <span className="font-mono text-xs" style={{ color: hexColor }}>
+                    <span className="font-mono text-[10px] sm:text-xs" style={{ color: hexColor }}>
                       {cat.totalXP.toLocaleString()} XP
                     </span>
                   </Link>
@@ -333,9 +341,9 @@ export default function DashboardPage() {
         </div>
 
         {/* 2-column grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6">
           {/* Left Column */}
-          <div className="space-y-6">
+          <div className="space-y-5 md:space-y-6">
             {/* Quick Stats */}
             {profile && (
               <div className={cardClass}>
@@ -364,15 +372,15 @@ export default function DashboardPage() {
                   <p className="font-body text-sm text-zinc-500">No XP logged yet.</p>
                 ) : (
                   logs.slice(0, 8).map((log) => (
-                    <div key={log.id} className="flex items-center justify-between border-b border-zinc-800 pb-2 last:border-0">
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-3 h-3 text-neonGreen" />
-                        <span className="font-mono text-sm text-neonGreen">+{log.amount}</span>
+                    <div key={log.id} className="flex items-center justify-between gap-2 border-b border-zinc-800 pb-2 last:border-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Zap className="w-3 h-3 text-neonGreen shrink-0" />
+                        <span className="font-mono text-sm text-neonGreen shrink-0">+{log.amount}</span>
                         {log.source && (
-                          <span className="font-body text-xs text-zinc-500 truncate max-w-[120px]">{log.source}</span>
+                          <span className="font-body text-xs text-zinc-500 truncate">{log.source}</span>
                         )}
                       </div>
-                      <span className="font-mono text-[10px] text-zinc-600">
+                      <span className="font-mono text-[10px] text-zinc-600 shrink-0">
                         {new Date(log.createdAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -396,14 +404,14 @@ export default function DashboardPage() {
                   {activeGoals.map((goal) => {
                     const pct = goal.targetValue > 0 ? Math.min(100, Math.round((goal.currentValue / goal.targetValue) * 100)) : 0;
                     return (
-                      <div key={goal.id} className="border border-zinc-800 bg-zinc-950 p-3">
-                        <div className="mb-2 flex items-center justify-between">
-                          <span className="font-body text-sm text-white">{goal.title}</span>
-                          <span className="font-mono text-xs text-neonGreen">{pct}%</span>
+                      <div key={goal.id} className="border border-zinc-800 bg-zinc-950 p-3 rounded-md">
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <span className="font-body text-sm text-white truncate">{goal.title}</span>
+                          <span className="font-mono text-xs text-neonGreen shrink-0">{pct}%</span>
                         </div>
-                        <div className="h-1.5 border border-zinc-700 bg-zinc-800">
+                        <div className="h-1.5 border border-zinc-700 bg-zinc-800 rounded-full overflow-hidden">
                           <motion.div
-                            className="h-full bg-neonGreen"
+                            className="h-full bg-neonGreen rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${pct}%` }}
                             transition={{ duration: 0.6 }}
@@ -418,7 +426,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Column */}
-          <div className="space-y-6">
+          <div className="space-y-5 md:space-y-6">
             {/* Today's Habits */}
             <div className={cardClass}>
               <div className="flex items-center justify-between mb-4">
@@ -432,14 +440,14 @@ export default function DashboardPage() {
                   <p className="font-body text-sm text-zinc-500">No habits yet.</p>
                 ) : (
                   todayHabits.map((habit) => (
-                    <div key={habit.id} className="flex items-center justify-between border border-zinc-800 p-3 bg-zinc-950">
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="w-3 h-3 text-neonGreen" />
-                        <span className="font-body text-sm text-white">{habit.name}</span>
-                        <span className="font-mono text-xs text-neonGreen">+{habit.xpReward}</span>
+                    <div key={habit.id} className="flex items-center justify-between gap-2 border border-zinc-800 p-3 bg-zinc-950 rounded-md">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <CheckSquare className="w-3 h-3 text-neonGreen shrink-0" />
+                        <span className="font-body text-sm text-white truncate">{habit.name}</span>
+                        <span className="font-mono text-xs text-neonGreen shrink-0">+{habit.xpReward}</span>
                       </div>
                       {habit.streak > 0 && (
-                        <span className="font-mono text-xs text-neonYellow flex items-center gap-1">
+                        <span className="font-mono text-xs text-neonYellow flex items-center gap-1 shrink-0">
                           <Flame className="w-3 h-3" /> {habit.streak}
                         </span>
                       )}
@@ -490,16 +498,16 @@ export default function DashboardPage() {
                   <p className="font-body text-sm text-zinc-500">No unread notifications.</p>
                 ) : (
                   unreadNotifications.map((n) => (
-                    <div key={n.id} className="flex items-start justify-between gap-2 border border-zinc-800 bg-zinc-950 p-3">
+                    <div key={n.id} className="flex items-start justify-between gap-2 border border-zinc-800 bg-zinc-950 p-3 rounded-md">
                       <div className="min-w-0 flex-1">
-                        <p className="font-body text-sm font-medium text-white">{n.title}</p>
+                        <p className="font-body text-sm font-medium text-white truncate">{n.title}</p>
                         <p className="font-body text-xs text-zinc-400 line-clamp-1">{n.message}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => markAsRead(n.id)}
                         aria-label="Dismiss"
-                        className="shrink-0 border border-zinc-700 p-1 text-zinc-500 hover:text-neonPink hover:border-neonPink transition-colors"
+                        className="shrink-0 border border-zinc-700 p-1.5 rounded-md text-zinc-500 hover:text-neonPink hover:border-neonPink transition-colors"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -514,18 +522,18 @@ export default function DashboardPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-2 border-neonGreen bg-zinc-900 p-5 shadow-[4px_4px_0px_0px_#39ff14]"
+                className="border-2 border-neonGreen bg-zinc-900 p-4 sm:p-5 rounded-md shadow-[4px_4px_0px_0px_#39ff14]"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-body text-xs uppercase tracking-wider text-zinc-400">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-body text-[10px] sm:text-xs uppercase tracking-wider text-zinc-400">
                       XP Balance
                     </p>
-                    <p className="font-heading text-3xl text-neonGreen mt-1">
+                    <p className="font-heading text-2xl sm:text-3xl text-neonGreen mt-1">
                       <AnimatedXPCounter value={profile.totalXP} />
                     </p>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex flex-col items-end gap-1 shrink-0">
                     <div className="flex items-center gap-1">
                       <TrendingUp className="w-3 h-3 text-neonBlue" />
                       <span className="font-mono text-xs text-neonBlue">Lv {profile.level}</span>

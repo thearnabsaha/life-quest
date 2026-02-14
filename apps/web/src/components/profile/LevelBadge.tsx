@@ -2,14 +2,14 @@ import type { Rank } from '@life-quest/types';
 import clsx from 'clsx';
 
 const RANK_COLORS: Record<Rank, string> = {
-  E: 'border-zinc-500 text-zinc-400 shadow-[6px_6px_0px_0px_#71717a]',
-  D: 'border-neonBlue text-neonBlue shadow-[6px_6px_0px_0px_#00d4ff]',
-  C: 'border-neonGreen text-neonGreen shadow-[6px_6px_0px_0px_#39ff14]',
-  B: 'border-neonYellow text-neonYellow shadow-[6px_6px_0px_0px_#ffe600]',
-  A: 'border-neonPink text-neonPink shadow-[6px_6px_0px_0px_#ff2d95]',
-  S: 'border-neonPurple text-neonPurple shadow-[6px_6px_0px_0px_#bf00ff]',
-  SS: 'border-neonPurple text-neonPurple shadow-[6px_6px_0px_0px_#bf00ff]',
-  SSS: 'border-neonPurple shadow-[6px_6px_0px_0px_#bf00ff]',
+  E: 'border-zinc-500 text-zinc-400 shadow-[3px_3px_0px_0px_#71717a] sm:shadow-[4px_4px_0px_0px_#71717a]',
+  D: 'border-neonBlue text-neonBlue shadow-[3px_3px_0px_0px_#00d4ff] sm:shadow-[4px_4px_0px_0px_#00d4ff]',
+  C: 'border-neonGreen text-neonGreen shadow-[3px_3px_0px_0px_#39ff14] sm:shadow-[4px_4px_0px_0px_#39ff14]',
+  B: 'border-neonYellow text-neonYellow shadow-[3px_3px_0px_0px_#ffe600] sm:shadow-[4px_4px_0px_0px_#ffe600]',
+  A: 'border-neonPink text-neonPink shadow-[3px_3px_0px_0px_#ff2d95] sm:shadow-[4px_4px_0px_0px_#ff2d95]',
+  S: 'border-neonPurple text-neonPurple shadow-[3px_3px_0px_0px_#bf00ff] sm:shadow-[4px_4px_0px_0px_#bf00ff]',
+  SS: 'border-neonPurple text-neonPurple shadow-[3px_3px_0px_0px_#bf00ff] sm:shadow-[4px_4px_0px_0px_#bf00ff]',
+  SSS: 'border-neonPurple shadow-[3px_3px_0px_0px_#bf00ff] sm:shadow-[4px_4px_0px_0px_#bf00ff]',
 };
 
 interface LevelBadgeProps {

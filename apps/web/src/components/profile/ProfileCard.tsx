@@ -14,8 +14,8 @@ export function ProfileCard({ profile }: ProfileCardProps) {
   const displayName = profile.displayName || 'Hunter';
 
   return (
-    <div className="border-2 border-white bg-zinc-900 p-6 shadow-[6px_6px_0px_0px_#39ff14]">
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+    <div className="border-2 border-white bg-zinc-900 p-4 sm:p-6 rounded-md shadow-[4px_4px_0px_0px_#39ff14] sm:shadow-[6px_6px_0px_0px_#39ff14]">
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
         {/* Avatar - left */}
         <div className="flex-shrink-0">
           <AvatarDisplay
@@ -26,9 +26,9 @@ export function ProfileCard({ profile }: ProfileCardProps) {
         </div>
 
         {/* Name, Rank, Level - center */}
-        <div className="flex-1 flex flex-col items-center md:items-start gap-3 text-center md:text-left">
+        <div className="flex-1 flex flex-col items-center md:items-start gap-2 sm:gap-3 text-center md:text-left min-w-0 w-full">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <h1 className="font-heading text-xl md:text-2xl text-white">
+            <h1 className="font-heading text-lg sm:text-xl md:text-2xl text-white">
               {displayName}
             </h1>
             <LevelBadge level={profile.level} rank={profile.rank} size="sm" />
@@ -38,7 +38,7 @@ export function ProfileCard({ profile }: ProfileCardProps) {
       </div>
 
       {/* XP Bar - bottom, full width */}
-      <div className="mt-6">
+      <div className="mt-4 sm:mt-6">
         <XPBar
           totalXP={profile.totalXP}
           manualLevelOverride={profile.manualLevelOverride}

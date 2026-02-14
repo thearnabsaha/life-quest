@@ -311,4 +311,59 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* ===== Safe-area-aware layout utilities ===== */
+
+  /* Top padding that accounts for safe-area (notch/dynamic island) + topbar height */
+  .pt-topbar {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 3rem); /* 48px content */
+  }
+
+  @media (min-width: 768px) {
+    .pt-topbar {
+      padding-top: 3.5rem; /* 56px on desktop, no safe area needed */
+    }
+  }
+
+  /* Bottom padding that accounts for safe-area (home indicator) + bottom nav height */
+  .pb-bottomnav {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4rem); /* 64px */
+  }
+
+  @media (min-width: 768px) {
+    .pb-bottomnav {
+      padding-bottom: 2rem; /* 32px on desktop, no bottom nav */
+    }
+  }
+
+  /* Position above bottom nav (for FABs, chat panels, etc.) */
+  .bottom-above-nav {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 68px);
+  }
+
+  @media (min-width: 768px) {
+    .bottom-above-nav {
+      bottom: 1.5rem; /* 24px on desktop */
+    }
+  }
+
+  /* Chat panel expanded top position */
+  .top-below-topbar {
+    top: calc(env(safe-area-inset-top, 0px) + 3rem);
+  }
+
+  @media (min-width: 768px) {
+    .top-below-topbar {
+      top: auto;
+    }
+  }
+
+  /* Hardware-accelerated fixed positioning — prevents jitter on mobile scroll */
+  .fixed-gpu {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
 }
